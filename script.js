@@ -3,15 +3,15 @@
    Product Catalog Data, Filtering, Cart Drawer & WhatsApp Integration
    ========================================================================== */
 
-// Product Dataset
+// Product Dataset with High-Definition Online Fabric Images
 const productsData = [
   {
     id: 1,
-    name: "Executive Suiting Material (Grey/Navy)",
+    name: "Executive Suiting Material (Navy/Grey)",
     category: "Executive",
     tag: "Top Seller",
     desc: "Crisp, premium structured fabric for bespoke suits, agbada, and executive suits.",
-    image: "images/executive_fabric_1786083488462.jpg"
+    image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: 2,
@@ -19,7 +19,7 @@ const productsData = [
     category: "Abaya",
     tag: "Best Quality",
     desc: "Ultra-soft, opaque silk fabric with gentle drape, ideal for modern modesty fashion.",
-    image: "images/abaya_material_1786083502735.jpg"
+    image: "https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: 3,
@@ -27,7 +27,7 @@ const productsData = [
     category: "Duchess",
     tag: "Glamour",
     desc: "Heavyweight glossy satin fabric roll for royal occasions, gowns, and luxury wear.",
-    image: "images/duchess_fabric_1786083472064.jpg"
+    image: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: 4,
@@ -35,7 +35,7 @@ const productsData = [
     category: "Jonkoso",
     tag: "Traditional",
     desc: "Enduring woven pattern textile crafted for traditional and contemporary styles.",
-    image: "images/jonkoso_fabric_1786098349901.jpg"
+    image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: 5,
@@ -43,7 +43,7 @@ const productsData = [
     category: "ModestWear",
     tag: "Essentials",
     desc: "Comfortable, double-layer breathable chiffon niqob designed for ease and elegance.",
-    image: "images/niqob_sleeves_1786098361398.jpg"
+    image: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: 6,
@@ -51,7 +51,7 @@ const productsData = [
     category: "ModestWear",
     tag: "Daily Wear",
     desc: "Soft cotton-spandex arm sleeves & opaque velvet socks for everyday modesty.",
-    image: "images/niqob_sleeves_1786098361398.jpg"
+    image: "https://images.unsplash.com/photo-1582533561751-ef6f6ab93a2e?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: 7,
@@ -59,7 +59,7 @@ const productsData = [
     category: "Executive",
     tag: "New Arrival",
     desc: "High-grade wrinkle-resistant suiting fabric for corporate and ceremonial wear.",
-    image: "images/hero_fabrics_1786083472064.jpg"
+    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: 8,
@@ -67,7 +67,7 @@ const productsData = [
     category: "Abaya",
     tag: "Popular",
     desc: "Original Dubai Nida fabric with rich color tone and cooling touch.",
-    image: "images/abaya_material_1786083502735.jpg"
+    image: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80"
   }
 ];
 
@@ -125,7 +125,7 @@ function filterCategory(category) {
   const filterBtns = document.querySelectorAll('.filter-btn');
   filterBtns.forEach(btn => {
     btn.classList.remove('active');
-    if (btn.getAttribute('onclick').includes(`'${category}'`)) {
+    if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(`'${category}'`)) {
       btn.classList.add('active');
     }
   });
@@ -258,7 +258,7 @@ function initCartDrawer() {
     cartBtn.addEventListener('click', openCartDrawer);
   }
 
-  if (closeCartBtn && cartOverlay) {
+  if (closeCartBtn && closeCartBtn) {
     closeCartBtn.addEventListener('click', closeCartDrawer);
   }
 
