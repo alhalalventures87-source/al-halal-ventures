@@ -19,7 +19,7 @@ const productsData = [
     category: "Duchess",
     tag: "Glamour",
     desc: "Heavyweight glossy satin fabric roll for royal occasions, gowns, and luxury wear.",
-    image: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=800&q=80"
+    image: "images/duchess_material.jpg"
   },
   {
     id: 4,
