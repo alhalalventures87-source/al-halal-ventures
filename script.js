@@ -11,7 +11,7 @@ const productsData = [
     category: "Executive",
     tag: "Top Seller",
     desc: "Crisp, premium structured fabric for bespoke suits, agbada, and executive suits.",
-    image: "images/executive_clean.jpg"
+    image: "images/executive_market.jpg"
   },
   {
     id: 2,
@@ -59,7 +59,7 @@ const productsData = [
     category: "Executive",
     tag: "New Arrival",
     desc: "High-grade wrinkle-resistant suiting fabric for corporate and ceremonial wear.",
-    image: "images/executive_clean.jpg"
+    image: "images/executive_market.jpg"
   },
   {
     id: 8,
