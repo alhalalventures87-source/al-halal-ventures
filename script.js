@@ -14,14 +14,6 @@ const productsData = [
     image: "images/executive_market.jpg"
   },
   {
-    id: 2,
-    name: "Luxury Silk Abaya Material",
-    category: "Abaya",
-    tag: "Best Quality",
-    desc: "Ultra-soft, opaque silk fabric with gentle drape, ideal for modern modesty fashion.",
-    image: "https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=800&q=80"
-  },
-  {
     id: 3,
     name: "Royal Duchess Satin Material",
     category: "Duchess",
@@ -60,14 +52,6 @@ const productsData = [
     tag: "New Arrival",
     desc: "High-grade wrinkle-resistant suiting fabric for corporate and ceremonial wear.",
     image: "images/executive_market.jpg"
-  },
-  {
-    id: 8,
-    name: "Flowing Nida Abaya Material",
-    category: "Abaya",
-    tag: "Popular",
-    desc: "Original Dubai Nida fabric with rich color tone and cooling touch.",
-    image: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80"
   }
 ];
 
