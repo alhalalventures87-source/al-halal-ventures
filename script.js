@@ -196,7 +196,7 @@ function checkoutWhatsApp() {
   });
   message += "\nPlease let me know the total price and payment/delivery details. Thank you!";
 
-  const waUrl = `https://wa.me/23462761948?text=${encodeURIComponent(message)}`;
+  const waUrl = `https://wa.me/2349071351283?text=${encodeURIComponent(message)}`;
   window.open(waUrl, '_blank');
 }
 
