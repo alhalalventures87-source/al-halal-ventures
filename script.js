@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderProducts(productsData);
   initNavigation();
   initCartDrawer();
+  initHeroSlider();
 });
 
 // Render Product Grid
@@ -275,4 +276,72 @@ function handleFormSubmit(e) {
 
   const waUrl = `https://wa.me/23462761948?text=${encodeURIComponent(text)}`;
   window.open(waUrl, '_blank');
+}
+
+// Hero Slider Carousel Logic
+let currentSlideIndex = 0;
+let heroSliderTimer = null;
+
+const heroSlideBadgeData = [
+  { title: "Executive Fabrics", subtitle: "Specialist Collection" },
+  { title: "Executive Suiting", subtitle: "Corporate & Ceremony" },
+  { title: "Duchess Satin", subtitle: "Royal Celebration Rolls" },
+  { title: "Jonkoso Materials", subtitle: "Textured Fabric Display" }
+];
+
+function initHeroSlider() {
+  const slides = document.querySelectorAll('#heroSliderSlides .slide');
+  if (!slides || slides.length === 0) return;
+  startHeroSliderTimer();
+}
+
+function startHeroSliderTimer() {
+  stopHeroSliderTimer();
+  heroSliderTimer = setInterval(() => {
+    moveHeroSlide(1);
+  }, 4500);
+}
+
+function stopHeroSliderTimer() {
+  if (heroSliderTimer) clearInterval(heroSliderTimer);
+}
+
+function setHeroSlide(index) {
+  const slides = document.querySelectorAll('#heroSliderSlides .slide');
+  const dots = document.querySelectorAll('#heroSliderDots .dot');
+  const badgeTitle = document.getElementById('heroBadgeTitle');
+  const badgeSubtitle = document.getElementById('heroBadgeSubtitle');
+
+  if (!slides.length) return;
+
+  if (index >= slides.length) currentSlideIndex = 0;
+  else if (index < 0) currentSlideIndex = slides.length - 1;
+  else currentSlideIndex = index;
+
+  slides.forEach((slide, idx) => {
+    if (idx === currentSlideIndex) {
+      slide.classList.add('active');
+    } else {
+      slide.classList.remove('active');
+    }
+  });
+
+  dots.forEach((dot, idx) => {
+    if (idx === currentSlideIndex) {
+      dot.classList.add('active');
+    } else {
+      dot.classList.remove('active');
+    }
+  });
+
+  if (badgeTitle && badgeSubtitle && heroSlideBadgeData[currentSlideIndex]) {
+    badgeTitle.textContent = heroSlideBadgeData[currentSlideIndex].title;
+    badgeSubtitle.textContent = heroSlideBadgeData[currentSlideIndex].subtitle;
+  }
+
+  startHeroSliderTimer();
+}
+
+function moveHeroSlide(direction) {
+  setHeroSlide(currentSlideIndex + direction);
 }

@@ -102,13 +102,40 @@
       </div>
 
       <div class="hero-image-card">
-        <div class="image-frame">
-          <img src="images/hero_executive_yellow.jpg" alt="Al Halal Executive Fabric Collection" class="hero-main-img">
+        <div class="image-frame hero-slider">
+          <div class="slider-slides" id="heroSliderSlides">
+            <div class="slide active">
+              <img src="images/hero_executive_yellow.jpg" alt="Executive Fabric Collection">
+            </div>
+            <div class="slide">
+              <img src="images/executive_market.jpg" alt="Executive Suiting Materials">
+            </div>
+            <div class="slide">
+              <img src="images/duchess_material.jpg" alt="Royal Duchess Satin Fabrics">
+            </div>
+            <div class="slide">
+              <img src="images/jonkoso_material.jpg" alt="Jonkoso Materials Collection">
+            </div>
+          </div>
+
+          <!-- Slider Controls -->
+          <button class="slider-btn prev-btn" aria-label="Previous Slide" onclick="moveHeroSlide(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="slider-btn next-btn" aria-label="Next Slide" onclick="moveHeroSlide(1)"><i class="fa-solid fa-chevron-right"></i></button>
+
+          <!-- Slider Dots -->
+          <div class="slider-dots" id="heroSliderDots">
+            <span class="dot active" onclick="setHeroSlide(0)"></span>
+            <span class="dot" onclick="setHeroSlide(1)"></span>
+            <span class="dot" onclick="setHeroSlide(2)"></span>
+            <span class="dot" onclick="setHeroSlide(3)"></span>
+          </div>
+
+          <!-- Floating Badge -->
           <div class="floating-badge">
             <i class="fa-solid fa-star text-gold"></i>
             <div>
-              <strong>Executive Fabrics</strong>
-              <small>Specialist Collection</small>
+              <strong id="heroBadgeTitle">Executive Fabrics</strong>
+              <small id="heroBadgeSubtitle">Specialist Collection</small>
             </div>
           </div>
         </div>
