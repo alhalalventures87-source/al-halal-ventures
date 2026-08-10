@@ -36,7 +36,7 @@ const productsData = [
     tag: "Essentials",
     desc: "Comfortable, double-layer breathable chiffon niqob designed for ease and elegance.",
     image: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=800&q=80"
-
+  },
   {
     id: 7,
     name: "Executive Wool Blend Material",
