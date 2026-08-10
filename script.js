@@ -27,7 +27,7 @@ const productsData = [
     category: "Jonkoso",
     tag: "Traditional",
     desc: "Enduring woven pattern textile crafted for traditional and contemporary styles.",
-    image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80"
+    image: "images/jonkoso_material.jpg"
   },
   {
     id: 5,
