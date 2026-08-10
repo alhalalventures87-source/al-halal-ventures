@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Portal | Al Halāl Ventures</title>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="payment.css">
+</head>
+<body class="payment-portal-body">
+
+  <!-- Header / Navigation -->
+  <header class="main-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand-logo">
+        <div class="logo-icon">
+          <i class="fa-solid fa-feather-pointed"></i>
+        </div>
+        <div class="logo-text">
+          <span class="brand-name">Al Halāl Ventures</span>
+          <span class="brand-tagline">Elegance Rooted In Modesty</span>
+        </div>
+      </a>
+      <nav class="navbar">
+        <a href="index.html#home" class="nav-link"><i class="fa-solid fa-arrow-left-long"></i> Back to Catalog</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="payment-main container">
+    <!-- Intro Section -->
+    <div class="payment-intro text-center">
+      <span class="sub-heading"><i class="fa-solid fa-lock"></i> Secured Checkout Portal</span>
+      <h1 class="section-title">Complete Your Fabric Order</h1>
+      <p class="section-desc">Review your selected cloth materials, fill in your delivery address, and proceed with the bank transfer to verify your order.</p>
+      <div class="title-underline"></div>
+    </div>
+
+    <!-- Main Payment Grid -->
+    <div class="payment-grid">
+      
+      <!-- Column 1: Order Summary & Delivery Details -->
+      <div class="grid-col-left">
+        <!-- Order Summary Card -->
+        <div class="glass-panel order-summary-card">
+          <h2 class="panel-title"><i class="fa-solid fa-receipt text-gold"></i> 1. Order Summary</h2>
+          <div class="checkout-items-list" id="checkoutItemsList">
+            <!-- Dynamic items populated by JS -->
+          </div>
+          
+          <div class="summary-cost-breakdown">
+            <div class="cost-row">
+              <span>Items Subtotal:</span>
+              <span id="summarySubtotal">₦0</span>
+            </div>
+            <div class="cost-row">
+              <span>Delivery Fee (Nationwide):</span>
+              <span id="summaryDelivery">₦3,500</span>
+            </div>
+            <div class="cost-row grand-total-row">
+              <span>Grand Total:</span>
+              <strong id="summaryGrandTotal" class="text-gold">₦0</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Details Form -->
+        <div class="glass-panel delivery-details-card">
+          <h2 class="panel-title"><i class="fa-solid fa-truck-fast text-gold"></i> 2. Delivery Information</h2>
+          <form id="paymentForm" onsubmit="processOrderCheckout(event)">
+            <div class="form-group">
+              <label for="fullName">Full Name / Business Name</label>
+              <input type="text" id="fullName" required placeholder="e.g. Hajia Fatima Yusuf">
+            </div>
+            
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="contactPhone">WhatsApp Number</label>
+                <input type="tel" id="contactPhone" required placeholder="e.g. +234 907 135 1283">
+              </div>
+              <div class="form-group">
+                <label for="altPhone">Alternate Phone Number</label>
+                <input type="tel" id="altPhone" placeholder="e.g. 0912 027 3899">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="deliveryAddress">Detailed Shipping Address</label>
+              <textarea id="deliveryAddress" rows="3" required placeholder="Enter house number, street name, city, state, and specific landmarks..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="paymentRef">Payment Reference Name / Sender Name</label>
+              <input type="text" id="paymentRef" required placeholder="Name on bank transfer receipt (e.g. FATIMA YUSUF)">
+            </div>
+
+            <!-- This hidden submit lets standard form validation run -->
+            <button type="submit" style="display: none;" id="hiddenSubmitBtn"></button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Column 2: Payment Instructions -->
+      <div class="grid-col-right">
+        <div class="glass-panel payment-instructions-card">
+          <h2 class="panel-title"><i class="fa-solid fa-building-columns text-gold"></i> 3. Payment Instructions</h2>
+          
+          <div class="instructions-steps">
+            <div class="step-item">
+              <div class="step-number">1</div>
+              <p>Transfer the calculated **Grand Total** to the official corporate account below:</p>
+            </div>
+
+            <!-- Corporate Bank Card -->
+            <div class="bank-details-card">
+              <div class="bank-card-glow"></div>
+              <div class="bank-header">
+                <span class="bank-brand"><i class="fa-solid fa-wallet"></i> Official Payments</span>
+                <span class="bank-network">Access Bank</span>
+              </div>
+              <div class="bank-account-num">
+                <span id="accountNumText">09071351283</span>
+                <button class="copy-acc-btn" onclick="copyAccountNumber()" title="Copy Account Number">
+                  <i class="fa-solid fa-copy"></i>
+                </button>
+              </div>
+              <div class="bank-card-footer">
+                <div>
+                  <small>ACCOUNT NAME</small>
+                  <strong>Al Halāl Ventures</strong>
+                </div>
+                <div class="bank-seal">
+                  <i class="fa-solid fa-shield-halved"></i> Verified
+                </div>
+              </div>
+            </div>
+
+            <div class="step-item" style="margin-top: 1.5rem;">
+              <div class="step-number">2</div>
+              <p>Input your **Payment Reference Name** (the name on the bank account used to transfer) in Section 2.</p>
+            </div>
+            
+            <div class="step-item">
+              <div class="step-number">3</div>
+              <p>Click the button below. This will log the order in your **local history** and open **WhatsApp** to send the receipt details directly to us for instant verification and shipping dispatch.</p>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-whatsapp-checkout btn-block" onclick="triggerCheckoutForm()">
+            <i class="fa-brands fa-whatsapp"></i> Confirm & Send To WhatsApp
+          </button>
+          
+          <p class="verification-helper-text">
+            <i class="fa-solid fa-info-circle"></i> Payments are manually verified within minutes of sending your receipt on WhatsApp.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Section 3: Local Payment & Order History -->
+    <div class="glass-panel history-section" style="margin-top: 4rem; margin-bottom: 5rem;">
+      <div class="history-header">
+        <h2><i class="fa-solid fa-history text-gold"></i> Your Personal Order History</h2>
+        <span class="history-badge" id="historyCount">0 Orders</span>
+      </div>
+      <p class="history-subtitle">Below is the record of orders placed from this browser. These are stored locally for your reference.</p>
+      
+      <div class="history-table-wrapper">
+        <table class="history-table" id="historyTable">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Date & Time</th>
+              <th>Items Ordered</th>
+              <th>Total Amount</th>
+              <th>Sender Reference</th>
+              <th>Verification Status</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <!-- Dynamic history rows populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="container">
+      <p>&copy; 2026 Al Halāl Ventures. All Rights Reserved. Elegance Rooted In Modesty.</p>
+    </div>
+  </footer>
+
+  <!-- Notification Toast -->
+  <div class="toast" id="toast">Copied to clipboard!</div>
+
+  <!-- JavaScript Files -->
+  <script src="payment.js"></script>
+</body>
+</html>

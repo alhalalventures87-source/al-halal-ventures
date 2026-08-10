@@ -518,8 +518,12 @@
           <span>Total Selected Items:</span>
           <strong id="cartTotalItems">0 items</strong>
         </div>
-        <button class="btn btn-whatsapp btn-block mt-3" id="whatsappCheckoutBtn" onclick="checkoutWhatsApp()">
-          <i class="fa-brands fa-whatsapp"></i> Send Order to WhatsApp (0907 135 1283)
+        <div class="cart-total-row" style="margin-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 0.6rem;">
+          <span>Estimated Subtotal:</span>
+          <strong id="cartSubtotal" style="color: var(--accent-gold); font-size: 1.2rem;">₦0</strong>
+        </div>
+        <button class="btn btn-primary btn-block mt-3" id="whatsappCheckoutBtn" onclick="checkoutWhatsApp()" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 1rem; border-radius: var(--radius-md); font-weight: 600; font-family: var(--font-body); cursor: pointer; border: 1px solid var(--glass-border); background: linear-gradient(135deg, var(--accent-purple), var(--primary-main)); color: #fff; transition: var(--transition);">
+          <i class="fa-solid fa-receipt"></i> Proceed to Payment
         </button>
       </div>
     </div>

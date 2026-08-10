@@ -11,7 +11,9 @@ const productsData = [
     category: "Executive",
     tag: "Top Seller",
     desc: "Crisp, premium structured fabric for bespoke suits, agbada, and executive suits.",
-    image: "images/executive_market.jpg"
+    image: "images/executive_market.jpg",
+    price: 8500,
+    unit: "yard"
   },
   {
     id: 3,
@@ -19,7 +21,9 @@ const productsData = [
     category: "Duchess",
     tag: "Glamour",
     desc: "Heavyweight glossy satin fabric roll for royal occasions, gowns, and luxury wear.",
-    image: "images/duchess_material.jpg"
+    image: "images/duchess_material.jpg",
+    price: 6000,
+    unit: "yard"
   },
   {
     id: 4,
@@ -27,7 +31,9 @@ const productsData = [
     category: "Jonkoso",
     tag: "Traditional",
     desc: "Enduring woven pattern textile crafted for traditional and contemporary styles.",
-    image: "images/jonkoso_material.jpg"
+    image: "images/jonkoso_material.jpg",
+    price: 7500,
+    unit: "yard"
   },
   {
     id: 5,
@@ -35,7 +41,9 @@ const productsData = [
     category: "ModestWear",
     tag: "Essentials",
     desc: "Comfortable, double-layer breathable chiffon niqob designed for ease and elegance.",
-    image: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=800&q=80"
+    image: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=800&q=80",
+    price: 4500,
+    unit: "set"
   },
   {
     id: 7,
@@ -43,12 +51,22 @@ const productsData = [
     category: "Executive",
     tag: "New Arrival",
     desc: "High-grade wrinkle-resistant suiting fabric for corporate and ceremonial wear.",
-    image: "images/executive_market.jpg"
+    image: "images/executive_market.jpg",
+    price: 9500,
+    unit: "yard"
   }
 ];
 
 // Cart State
 let cart = [];
+try {
+  const savedCart = localStorage.getItem('al_halal_cart_state');
+  if (savedCart) {
+    cart = JSON.parse(savedCart);
+  }
+} catch (e) {
+  console.error("Error loading cart state", e);
+}
 
 // DOM Elements
 document.addEventListener('DOMContentLoaded', () => {
@@ -56,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
   initCartDrawer();
   initHeroSlider();
+  updateCartUI(); // render cart from localStorage on load
 });
 
 // Render Product Grid
@@ -83,6 +102,10 @@ function renderProducts(items) {
       <div class="product-body">
         <h3 class="product-name">${product.name}</h3>
         <p class="product-desc">${product.desc}</p>
+        <div class="product-price-box" style="margin-bottom: 1.2rem; font-family: var(--font-body); display: flex; align-items: baseline; gap: 0.3rem;">
+          <span class="product-price" style="font-size: 1.3rem; font-weight: 700; color: var(--accent-gold);">₦${product.price.toLocaleString()}</span>
+          <span style="font-size: 0.85rem; opacity: 0.8; color: var(--text-light);">/ ${product.unit}</span>
+        </div>
         <div class="product-actions">
           <button class="btn btn-primary w-100" onclick="addToCart(${product.id})">
             <i class="fa-solid fa-plus"></i> Add To Order
@@ -138,12 +161,14 @@ function addToCart(productId) {
     cart.push({ ...item, qty: 1 });
   }
 
+  localStorage.setItem('al_halal_cart_state', JSON.stringify(cart));
   updateCartUI();
   openCartDrawer();
 }
 
 function removeFromCart(productId) {
   cart = cart.filter(c => c.id !== productId);
+  localStorage.setItem('al_halal_cart_state', JSON.stringify(cart));
   updateCartUI();
 }
 
@@ -151,11 +176,14 @@ function updateCartUI() {
   const countBadge = document.getElementById('cartCount');
   const totalCountText = document.getElementById('cartTotalItems');
   const cartContainer = document.getElementById('cartItemsContainer');
+  const subtotalEl = document.getElementById('cartSubtotal');
 
   const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
   if (countBadge) countBadge.textContent = totalQty;
   if (totalCountText) totalCountText.textContent = `${totalQty} item${totalQty !== 1 ? 's' : ''}`;
+  if (subtotalEl) subtotalEl.textContent = `₦${subtotal.toLocaleString()}`;
 
   if (!cartContainer) return;
 
@@ -171,13 +199,17 @@ function updateCartUI() {
   }
 
   cartContainer.innerHTML = cart.map(item => `
-    <div class="cart-item">
-      <img src="${item.image}" class="cart-item-img" alt="${item.name}">
-      <div class="cart-item-details">
-        <div class="cart-item-name">${item.name}</div>
-        <small style="color: var(--accent-gold);">Quantity: ${item.qty}</small>
+    <div class="cart-item" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05);">
+      <img src="${item.image}" class="cart-item-img" alt="${item.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-sm);">
+      <div class="cart-item-details" style="flex: 1;">
+        <div class="cart-item-name" style="font-weight: 600; font-size: 0.95rem; line-height: 1.3; margin-bottom: 0.2rem;">${item.name}</div>
+        <div style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.1rem;">
+          <span style="color: var(--accent-gold);">Qty: ${item.qty} ${item.unit}${item.qty !== 1 ? 's' : ''}</span>
+          <span style="opacity: 0.7;">₦${item.price.toLocaleString()} per ${item.unit}</span>
+          <strong style="color: var(--text-light); font-weight: 600; margin-top: 0.1rem;">Total: ₦${(item.price * item.qty).toLocaleString()}</strong>
+        </div>
       </div>
-      <button class="remove-cart-item" onclick="removeFromCart(${item.id})" title="Remove">
+      <button class="remove-cart-item" onclick="removeFromCart(${item.id})" title="Remove" style="background: none; border: none; color: #ff5252; cursor: pointer; padding: 0.5rem; transition: var(--transition);">
         <i class="fa-solid fa-trash-can"></i>
       </button>
     </div>
@@ -190,14 +222,8 @@ function checkoutWhatsApp() {
     return;
   }
 
-  let message = "Hello Al Halāl Ventures! 👋 I would like to make an inquiry / place an order for the following cloth materials:\n\n";
-  cart.forEach((item, index) => {
-    message += `${index + 1}. *${item.name}* (Qty: ${item.qty})\n`;
-  });
-  message += "\nPlease let me know the total price and payment/delivery details. Thank you!";
-
-  const waUrl = `https://wa.me/2349071351283?text=${encodeURIComponent(message)}`;
-  window.open(waUrl, '_blank');
+  localStorage.setItem('al_halal_pending_cart', JSON.stringify(cart));
+  window.location.href = 'payment.html';
 }
 
 // Navigation & Drawer Handlers
@@ -255,7 +281,6 @@ function closeCartDrawer() {
   const cartOverlay = document.getElementById('cartOverlay');
   if (cartOverlay) cartOverlay.classList.remove('active');
 }
-
 // Contact Form Handler
 function handleFormSubmit(e) {
   e.preventDefault();
@@ -266,7 +291,7 @@ function handleFormSubmit(e) {
 
   const text = `Hello Al Halāl Ventures! 👋\n\nName: *${name}*\nPhone: ${phone}\nInterested Material: *${material}*\n\nMessage/Quantity:\n${message}`;
 
-  const waUrl = `https://wa.me/23462761948?text=${encodeURIComponent(text)}`;
+  const waUrl = `https://wa.me/2349071351283?text=${encodeURIComponent(text)}`;
   window.open(waUrl, '_blank');
 }
 
