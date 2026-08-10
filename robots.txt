@@ -1,0 +1,6 @@
+# Al Halal Ventures - Robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://al-halal-ventures.vercel.app/sitemap.xml
