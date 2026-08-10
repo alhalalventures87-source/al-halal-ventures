@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merchant Portal | Al Halāl Ventures</title>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="payment.css">
+</head>
+<body class="payment-portal-body">
+
+  <!-- Header / Navigation -->
+  <header class="main-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand-logo">
+        <div class="logo-icon">
+          <i class="fa-solid fa-feather-pointed"></i>
+        </div>
+        <div class="logo-text">
+          <span class="brand-name">Al Halāl Ventures</span>
+          <span class="brand-tagline">Merchant Portal</span>
+        </div>
+      </a>
+      <nav class="navbar">
+        <a href="index.html#home" class="nav-link"><i class="fa-solid fa-arrow-left-long"></i> Back to Shop</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="payment-main container">
+    
+    <!-- Lock Screen: Enter Admin Password -->
+    <div id="adminLockScreen" class="auth-wrapper" style="max-width: 480px; margin: 4rem auto;">
+      <div class="payment-intro text-center">
+        <span class="sub-heading"><i class="fa-solid fa-user-shield"></i> Restricted Access</span>
+        <h1 class="section-title">Merchant Login</h1>
+        <p class="section-desc">Enter your merchant access key to view orders and set prices.</p>
+        <div class="title-underline"></div>
+      </div>
+
+      <div class="glass-panel" style="padding: 2.5rem;">
+        <form onsubmit="unlockAdminPortal(event)">
+          <div class="form-group">
+            <label for="adminPass">Merchant Password</label>
+            <input type="password" id="adminPass" required placeholder="Default password is: admin123" style="width: 100%; padding: 0.95rem 1.2rem; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-md); color: #fff;">
+          </div>
+          <button type="submit" class="btn btn-primary w-100" style="background: linear-gradient(135deg, var(--accent-purple), var(--primary-main)); color: #fff; padding: 1rem; border: none; font-weight: 600; border-radius: var(--radius-md); cursor: pointer; margin-top: 1rem;">
+            Authenticate Access
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Authenticated View: Admin Dashboard -->
+    <div id="adminDashboard" class="admin-wrapper" style="display: none;">
+      <div class="payment-intro text-center">
+        <span class="sub-heading"><i class="fa-solid fa-gears"></i> Command Center</span>
+        <h1 class="section-title">Al Halāl Merchant Panel</h1>
+        <p class="section-desc">Set materials prices and review incoming customer order specifications.</p>
+        <div class="title-underline"></div>
+      </div>
+
+      <!-- Quick Stats Metrics -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+        <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 0; display: flex; align-items: center; gap: 1.2rem;">
+          <div style="background: rgba(224, 169, 109, 0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 1.5rem;">
+            <i class="fa-solid fa-tags"></i>
+          </div>
+          <div>
+            <small style="opacity: 0.65; display: block; font-size: 0.75rem; text-transform: uppercase;">Active Fabrics</small>
+            <strong style="font-size: 1.4rem;" id="statProductCount">0</strong>
+          </div>
+        </div>
+        <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 0; display: flex; align-items: center; gap: 1.2rem;">
+          <div style="background: rgba(199, 125, 255, 0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-lilac); font-size: 1.5rem;">
+            <i class="fa-solid fa-receipt"></i>
+          </div>
+          <div>
+            <small style="opacity: 0.65; display: block; font-size: 0.75rem; text-transform: uppercase;">Total Orders</small>
+            <strong style="font-size: 1.4rem;" id="statTotalOrders">0</strong>
+          </div>
+        </div>
+        <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 0; display: flex; align-items: center; gap: 1.2rem;">
+          <div style="background: rgba(37, 211, 102, 0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--whatsapp-green); font-size: 1.5rem;">
+            <i class="fa-solid fa-sack-dollar"></i>
+          </div>
+          <div>
+            <small style="opacity: 0.65; display: block; font-size: 0.75rem; text-transform: uppercase;">Revenue Est.</small>
+            <strong style="font-size: 1.4rem;" id="statTotalRevenue">₦0</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="payment-grid">
+        
+        <!-- Column 1: Pricing Controls -->
+        <div class="grid-col-left">
+          <div class="glass-panel">
+            <h2 class="panel-title"><i class="fa-solid fa-edit text-gold"></i> Set Material Prices</h2>
+            <p style="font-size: 0.85rem; opacity: 0.75; margin-bottom: 1.5rem;">Update the price per yard or per unit for materials below. Changes will apply immediately across your entire website catalog.</p>
+            
+            <div id="pricingControlsList" style="display: flex; flex-direction: column; gap: 1.5rem;">
+              <!-- Javascript generates pricing inputs here -->
+            </div>
+            
+            <button class="btn btn-primary w-100" onclick="saveAllPrices()" style="background: linear-gradient(135deg, var(--accent-purple), var(--primary-main)); color: #fff; padding: 1rem; border: none; font-weight: 600; border-radius: var(--radius-md); cursor: pointer; margin-top: 2rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Save & Publish All Prices
+            </button>
+          </div>
+        </div>
+
+        <!-- Column 2: Order Management & Measurements -->
+        <div class="grid-col-right" style="grid-column: span 1;">
+          <div class="glass-panel" style="min-height: 480px;">
+            <h2 class="panel-title"><i class="fa-solid fa-scissors text-gold"></i> Tailor & Orders Queue</h2>
+            <p style="font-size: 0.85rem; opacity: 0.75; margin-bottom: 1.5rem;">Select an order below to inspect custom measurements and client details.</p>
+            
+            <div id="adminOrdersQueue" style="display: flex; flex-direction: column; gap: 1rem;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Master Order Database Log -->
+      <div class="glass-panel history-section" style="margin-top: 4rem; margin-bottom: 5rem;">
+        <div class="history-header">
+          <h2><i class="fa-solid fa-list-check text-gold"></i> Master Orders Register</h2>
+          <button class="btn" onclick="clearOrdersDatabase()" style="background: rgba(255, 82, 82, 0.1); border: 1px solid rgba(255, 82, 82, 0.2); color: #ff5252; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 0.85rem;"><i class="fa-solid fa-trash-arrow-up"></i> Reset Database</button>
+        </div>
+        
+        <div class="history-table-wrapper">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Date & Time</th>
+                <th>Client Name</th>
+                <th>Client Phone</th>
+                <th>Materials & Quantities</th>
+                <th>Total Paid</th>
+                <th>Sender Ref</th>
+              </tr>
+            </thead>
+            <tbody id="adminMasterTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Inspection Modal for Details -->
+  <div class="cart-drawer-overlay" id="orderInspectOverlay" style="display: none; z-index: 10000; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75);">
+    <div class="cart-drawer" style="max-width: 500px; width: 90%; height: auto; border-radius: var(--radius-lg); padding: 2.5rem; background: var(--bg-surface); border: 1px solid var(--glass-border); box-shadow: var(--shadow-md);">
+      <div class="cart-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+        <h3 style="font-family: var(--font-heading); color: #fff; margin: 0; font-size: 1.3rem;"><i class="fa-solid fa-magnifying-glass text-gold"></i> Inspect Order Details</h3>
+        <button onclick="closeInspectModal()" style="background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer;">&times;</button>
+      </div>
+      <div id="inspectModalContent" style="font-size: 0.95rem; line-height: 1.6;">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+  </div>
+
+  <footer class="main-footer">
+    <div class="container">
+      <p>&copy; 2026 Al Halāl Ventures. All Rights Reserved. Elegance Rooted In Modesty.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast">Prices Updated Successfully!</div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

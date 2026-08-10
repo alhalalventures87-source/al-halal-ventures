@@ -57,6 +57,21 @@ const productsData = [
   }
 ];
 
+// Local Storage Products Database
+let dbProducts = [];
+try {
+  const savedDB = localStorage.getItem('al_halal_products_db');
+  if (savedDB) {
+    dbProducts = JSON.parse(savedDB);
+  }
+} catch (e) {
+  console.error("Error loading products database", e);
+}
+if (dbProducts.length === 0) {
+  dbProducts = [...productsData];
+  localStorage.setItem('al_halal_products_db', JSON.stringify(dbProducts));
+}
+
 // Cart State
 let cart = [];
 try {
@@ -70,7 +85,7 @@ try {
 
 // DOM Elements
 document.addEventListener('DOMContentLoaded', () => {
-  renderProducts(productsData);
+  renderProducts(dbProducts); // Render from local database
   initNavigation();
   initCartDrawer();
   initHeroSlider();
@@ -131,9 +146,9 @@ function filterCategory(category) {
   });
 
   if (category === 'all') {
-    renderProducts(productsData);
+    renderProducts(dbProducts);
   } else {
-    const filtered = productsData.filter(p => p.category === category);
+    const filtered = dbProducts.filter(p => p.category === category);
     renderProducts(filtered);
   }
 }
@@ -141,7 +156,7 @@ function filterCategory(category) {
 // Search Filter
 function searchProducts() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
-  const filtered = productsData.filter(p => 
+  const filtered = dbProducts.filter(p => 
     p.name.toLowerCase().includes(query) || 
     p.desc.toLowerCase().includes(query) ||
     p.category.toLowerCase().includes(query)
@@ -151,19 +166,7 @@ function searchProducts() {
 
 // Cart Functions
 function addToCart(productId) {
-  const item = productsData.find(p => p.id === productId);
-  if (!item) return;
-
-  const existing = cart.find(c => c.id === productId);
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    cart.push({ ...item, qty: 1 });
-  }
-
-  localStorage.setItem('al_halal_cart_state', JSON.stringify(cart));
-  updateCartUI();
-  openCartDrawer();
+  openTailorModal(productId);
 }
 
 function removeFromCart(productId) {
@@ -206,6 +209,11 @@ function updateCartUI() {
         <div style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.1rem;">
           <span style="color: var(--accent-gold);">Qty: ${item.qty} ${item.unit}${item.qty !== 1 ? 's' : ''}</span>
           <span style="opacity: 0.7;">₦${item.price.toLocaleString()} per ${item.unit}</span>
+          ${item.measurements ? `
+            <span class="tailor-badge" style="color: var(--accent-lavender); font-size: 0.75rem; margin-top: 0.15rem; display: block; border-left: 2px solid var(--accent-gold); padding-left: 0.4rem; line-height: 1.3;">
+              Waist: ${item.measurements.waist}" | Length: ${item.measurements.length}" | Thigh: ${item.measurements.thigh}" | Ankle: ${item.measurements.ankle}"
+            </span>
+          ` : ''}
           <strong style="color: var(--text-light); font-weight: 600; margin-top: 0.1rem;">Total: ₦${(item.price * item.qty).toLocaleString()}</strong>
         </div>
       </div>
@@ -214,6 +222,108 @@ function updateCartUI() {
       </button>
     </div>
   `).join('');
+}
+
+// Tailoring & Custom Measurements Modal Logic
+function openTailorModal(productId) {
+  const item = dbProducts.find(p => p.id === productId);
+  if (!item) return;
+
+  document.getElementById('tailorModalProductId').value = productId;
+  document.getElementById('tailorModalProductName').textContent = item.name;
+  
+  const yardsLabel = document.getElementById('tailorYardsLabel');
+  const trouserSpecsGroup = document.getElementById('trouserSpecsGroup');
+  const includeTrouserCheckbox = document.getElementById('includeTrouserSpecs');
+  const trouserFields = document.getElementById('trouserSpecsFields');
+  
+  // Reset fields
+  document.getElementById('tailorYards').value = item.category === "ModestWear" ? "1" : "4";
+  includeTrouserCheckbox.checked = false;
+  trouserFields.style.display = "none";
+  
+  // Clear inputs
+  document.getElementById('trouserWaist').value = "";
+  document.getElementById('trouserLength').value = "";
+  document.getElementById('trouserThigh').value = "";
+  document.getElementById('trouserAnkle').value = "";
+  
+  if (item.category === "ModestWear") {
+    yardsLabel.textContent = "How many sets/packs do you need?";
+    trouserSpecsGroup.style.display = "none";
+  } else {
+    yardsLabel.textContent = "How many yards do you need?";
+    trouserSpecsGroup.style.display = "block";
+    
+    // Auto-fill measurements if user is logged in
+    const currentUserStr = localStorage.getItem('al_halal_current_user');
+    if (currentUserStr) {
+      try {
+        const user = JSON.parse(currentUserStr);
+        if (user.measurements) {
+          includeTrouserCheckbox.checked = true;
+          trouserFields.style.display = "block";
+          document.getElementById('trouserWaist').value = user.measurements.waist || "";
+          document.getElementById('trouserLength').value = user.measurements.length || "";
+          document.getElementById('trouserThigh').value = user.measurements.thigh || "";
+          document.getElementById('trouserAnkle').value = user.measurements.ankle || "";
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }
+  
+  const overlay = document.getElementById('tailorModalOverlay');
+  if (overlay) overlay.style.display = "flex";
+}
+
+function closeTailorModal() {
+  const overlay = document.getElementById('tailorModalOverlay');
+  if (overlay) overlay.style.display = "none";
+}
+
+function toggleTrouserSpecs(checkbox) {
+  const fields = document.getElementById('trouserSpecsFields');
+  if (fields) fields.style.display = checkbox.checked ? "block" : "none";
+}
+
+function confirmTailorSpecs(e) {
+  e.preventDefault();
+  const productId = parseInt(document.getElementById('tailorModalProductId').value);
+  const qty = parseFloat(document.getElementById('tailorYards').value) || 1;
+  const includeTrouser = document.getElementById('includeTrouserSpecs').checked;
+  
+  const item = dbProducts.find(p => p.id === productId);
+  if (!item) return;
+  
+  let measurements = null;
+  if (includeTrouser && item.category !== "ModestWear") {
+    measurements = {
+      waist: parseFloat(document.getElementById('trouserWaist').value) || 0,
+      length: parseFloat(document.getElementById('trouserLength').value) || 0,
+      thigh: parseFloat(document.getElementById('trouserThigh').value) || 0,
+      ankle: parseFloat(document.getElementById('trouserAnkle').value) || 0
+    };
+  }
+  
+  // Add to Cart
+  // Check if item with exact specs exists in cart
+  const existingIndex = cart.findIndex(c => c.id === productId && JSON.stringify(c.measurements) === JSON.stringify(measurements));
+  if (existingIndex > -1) {
+    cart[existingIndex].qty += qty;
+  } else {
+    cart.push({
+      ...item,
+      qty: qty,
+      measurements: measurements
+    });
+  }
+  
+  localStorage.setItem('al_halal_cart_state', JSON.stringify(cart));
+  updateCartUI();
+  closeTailorModal();
+  openCartDrawer();
 }
 
 function checkoutWhatsApp() {

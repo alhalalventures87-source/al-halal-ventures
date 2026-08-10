@@ -7,7 +7,27 @@ document.addEventListener('DOMContentLoaded', () => {
   loadOrderHistory();
   renderCheckoutSummary();
   renderOrderHistoryTable();
+  autoFillCustomerDetails();
 });
+
+// Auto-fill form fields if user is logged in
+function autoFillCustomerDetails() {
+  const userStr = localStorage.getItem('al_halal_current_user');
+  if (userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      const nameInput = document.getElementById('fullName');
+      const phoneInput = document.getElementById('contactPhone');
+      const addressInput = document.getElementById('deliveryAddress');
+      
+      if (nameInput) nameInput.value = user.name || "";
+      if (phoneInput) phoneInput.value = user.phone || "";
+      if (addressInput) addressInput.value = user.address || "";
+    } catch(e) {
+      console.error("Error auto-filling customer details", e);
+    }
+  }
+}
 
 // Load pending order list from Local Storage
 function loadPendingCart() {
@@ -61,7 +81,12 @@ function renderCheckoutSummary() {
           <img src="${item.image}" alt="${item.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: var(--radius-sm);">
           <div>
             <div style="font-weight: 500; font-size: 0.95rem;">${item.name}</div>
-            <small style="color: var(--accent-gold); font-size: 0.8rem;">₦${item.price.toLocaleString()} x ${item.qty} ${item.unit}${item.qty !== 1 ? 's' : ''}</small>
+            <small style="color: var(--accent-gold); display: block; font-size: 0.8rem; margin-top: 0.1rem;">₦${item.price.toLocaleString()} x ${item.qty} ${item.unit}${item.qty !== 1 ? 's' : ''}</small>
+            ${item.measurements ? `
+              <div style="font-size: 0.75rem; color: var(--accent-lavender); margin-top: 0.2rem; border-left: 2px solid var(--accent-gold); padding-left: 0.4rem; line-height: 1.3;">
+                Waist: ${item.measurements.waist}" | Length: ${item.measurements.length}" | Thigh: ${item.measurements.thigh}" | Ankle: ${item.measurements.ankle}"
+              </div>
+            ` : ''}
           </div>
         </div>
         <strong style="font-size: 0.95rem;">₦${itemTotal.toLocaleString()}</strong>
@@ -218,6 +243,9 @@ function processOrderCheckout(e) {
   waMessage += `📦 *ORDER ITEMS:*\n`;
   pendingCart.forEach((item, index) => {
     waMessage += `${index + 1}. *${item.name}* (Qty: ${item.qty} ${item.unit}${item.qty !== 1 ? 's' : ''}) - ₦${(item.price * item.qty).toLocaleString()}\n`;
+    if (item.measurements) {
+      waMessage += `   📏 _Tailor Specs:_ Waist: ${item.measurements.waist}" | Length: ${item.measurements.length}" | Thigh: ${item.measurements.thigh}" | Ankle: ${item.measurements.ankle}"\n`;
+    }
   });
   
   waMessage += `\n💳 *COST BREAKDOWN:*\n`;
