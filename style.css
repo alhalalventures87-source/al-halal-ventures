@@ -454,7 +454,7 @@ img {
 }
 
 .hero-slider {
-  height: 440px;
+  height: 360px;
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
