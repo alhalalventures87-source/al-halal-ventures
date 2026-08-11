@@ -35,15 +35,6 @@ async function onUserLoggedIn() {
   showProfileDashboard();
   await loadMeasurements();
   await loadOrderHistory();
-
-  // If user was redirected here after clicking Buy Now, take them back to catalog to complete order
-  const redirectProductId = localStorage.getItem('al_halal_redirect_product');
-  if (redirectProductId) {
-    showToast('Signed in successfully! Redirecting to complete your order...');
-    setTimeout(() => {
-      window.location.href = 'index.html#catalog';
-    }, 1000);
-  }
 }
 
 // ---- AUTH TAB SWITCHING ----
