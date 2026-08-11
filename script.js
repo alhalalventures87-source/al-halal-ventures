@@ -78,6 +78,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   initCartDrawer();
   initHeroSlider();
   updateCartUI();
+
+  // If user clicked Buy Now before logging in and just logged in, auto-open tailoring modal
+  const redirectProductId = localStorage.getItem('al_halal_redirect_product');
+  if (redirectProductId) {
+    localStorage.removeItem('al_halal_redirect_product');
+    const pId = parseInt(redirectProductId);
+    if (!isNaN(pId)) {
+      setTimeout(() => openTailorModal(pId), 400);
+    }
+  }
 });
 
 // Show a loading spinner in the product grid
@@ -196,7 +206,20 @@ function searchProducts() {
 }
 
 // Cart Functions
-function addToCart(productId) {
+async function addToCart(productId) {
+  let isLoggedIn = false;
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) isLoggedIn = true;
+  } catch (e) {}
+
+  if (!isLoggedIn && !localStorage.getItem('al_halal_current_user')) {
+    alert("Please sign in or create an account first to complete your fabric purchase.");
+    localStorage.setItem('al_halal_redirect_product', productId);
+    window.location.href = "profile.html";
+    return;
+  }
+
   openTailorModal(productId);
 }
 
