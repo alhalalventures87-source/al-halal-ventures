@@ -1,9 +1,10 @@
 /* ==========================================================================
    AL HALAL VENTURES - INTERACTIVE JAVASCRIPT
    Product Catalog Data, Filtering, Cart Drawer & WhatsApp Integration
+   Now powered by Supabase for real-time product pricing
    ========================================================================== */
 
-// Product Dataset with High-Definition Online Fabric Images
+// Fallback product dataset (used if Supabase is unavailable)
 const productsData = [
   {
     id: 1,
@@ -57,40 +58,71 @@ const productsData = [
   }
 ];
 
-// Local Storage Products Database
+// Live product list (populated from Supabase or fallback)
 let dbProducts = [];
-try {
-  const savedDB = localStorage.getItem('al_halal_products_db');
-  if (savedDB) {
-    dbProducts = JSON.parse(savedDB);
-  }
-} catch (e) {
-  console.error("Error loading products database", e);
-}
-if (dbProducts.length === 0) {
-  dbProducts = [...productsData];
-  localStorage.setItem('al_halal_products_db', JSON.stringify(dbProducts));
-}
 
-// Cart State
+// Cart State (still local for session speed)
 let cart = [];
 try {
   const savedCart = localStorage.getItem('al_halal_cart_state');
-  if (savedCart) {
-    cart = JSON.parse(savedCart);
-  }
+  if (savedCart) cart = JSON.parse(savedCart);
 } catch (e) {
   console.error("Error loading cart state", e);
 }
 
-// DOM Elements
-document.addEventListener('DOMContentLoaded', () => {
-  renderProducts(dbProducts); // Render from local database
+// ---- INITIALISE ----
+document.addEventListener('DOMContentLoaded', async () => {
+  showProductLoadingState();
+  await loadProductsFromSupabase();
   initNavigation();
   initCartDrawer();
   initHeroSlider();
-  updateCartUI(); // render cart from localStorage on load
+  updateCartUI();
 });
+
+// Show a loading spinner in the product grid
+function showProductLoadingState() {
+  const grid = document.getElementById('productGrid');
+  if (grid) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; color: rgba(255,255,255,0.7);">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.5rem; color: var(--accent-gold); margin-bottom: 1rem; display: block;"></i>
+        <p>Loading latest catalog & prices...</p>
+      </div>
+    `;
+  }
+}
+
+// Load products from Supabase (with localStorage fallback)
+async function loadProductsFromSupabase() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('products')
+      .select('*')
+      .order('id', { ascending: true });
+
+    if (error || !data || data.length === 0) {
+      console.warn("Supabase unavailable, using fallback products.");
+      dbProducts = [...productsData];
+    } else {
+      dbProducts = data.map(p => ({
+        id: p.id,
+        name: p.name,
+        category: p.category,
+        tag: p.tag,
+        desc: p.description,
+        image: p.image,
+        price: p.price,
+        unit: p.unit
+      }));
+    }
+  } catch (err) {
+    console.error("Error loading products from Supabase:", err);
+    dbProducts = [...productsData];
+  }
+
+  renderProducts(dbProducts);
+}
 
 // Render Product Grid
 function renderProducts(items) {
@@ -136,7 +168,6 @@ function renderProducts(items) {
 
 // Category Filter
 function filterCategory(category) {
-  // Update Active Filter Button
   const filterBtns = document.querySelectorAll('.filter-btn');
   filterBtns.forEach(btn => {
     btn.classList.remove('active');
@@ -156,8 +187,8 @@ function filterCategory(category) {
 // Search Filter
 function searchProducts() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
-  const filtered = dbProducts.filter(p => 
-    p.name.toLowerCase().includes(query) || 
+  const filtered = dbProducts.filter(p =>
+    p.name.toLowerCase().includes(query) ||
     p.desc.toLowerCase().includes(query) ||
     p.category.toLowerCase().includes(query)
   );
@@ -231,30 +262,30 @@ function openTailorModal(productId) {
 
   document.getElementById('tailorModalProductId').value = productId;
   document.getElementById('tailorModalProductName').textContent = item.name;
-  
+
   const yardsLabel = document.getElementById('tailorYardsLabel');
   const trouserSpecsGroup = document.getElementById('trouserSpecsGroup');
   const includeTrouserCheckbox = document.getElementById('includeTrouserSpecs');
   const trouserFields = document.getElementById('trouserSpecsFields');
-  
+
   // Reset fields
   document.getElementById('tailorYards').value = item.category === "ModestWear" ? "1" : "4";
   includeTrouserCheckbox.checked = false;
   trouserFields.style.display = "none";
-  
+
   // Clear inputs
   document.getElementById('trouserWaist').value = "";
   document.getElementById('trouserLength').value = "";
   document.getElementById('trouserThigh').value = "";
   document.getElementById('trouserAnkle').value = "";
-  
+
   if (item.category === "ModestWear") {
     yardsLabel.textContent = "How many sets/packs do you need?";
     trouserSpecsGroup.style.display = "none";
   } else {
     yardsLabel.textContent = "How many yards do you need?";
     trouserSpecsGroup.style.display = "block";
-    
+
     // Auto-fill measurements if user is logged in
     const currentUserStr = localStorage.getItem('al_halal_current_user');
     if (currentUserStr) {
@@ -273,7 +304,7 @@ function openTailorModal(productId) {
       }
     }
   }
-  
+
   const overlay = document.getElementById('tailorModalOverlay');
   if (overlay) overlay.style.display = "flex";
 }
@@ -293,10 +324,10 @@ function confirmTailorSpecs(e) {
   const productId = parseInt(document.getElementById('tailorModalProductId').value);
   const qty = parseFloat(document.getElementById('tailorYards').value) || 1;
   const includeTrouser = document.getElementById('includeTrouserSpecs').checked;
-  
+
   const item = dbProducts.find(p => p.id === productId);
   if (!item) return;
-  
+
   let measurements = null;
   if (includeTrouser && item.category !== "ModestWear") {
     measurements = {
@@ -306,20 +337,15 @@ function confirmTailorSpecs(e) {
       ankle: parseFloat(document.getElementById('trouserAnkle').value) || 0
     };
   }
-  
-  // Add to Cart
+
   // Check if item with exact specs exists in cart
   const existingIndex = cart.findIndex(c => c.id === productId && JSON.stringify(c.measurements) === JSON.stringify(measurements));
   if (existingIndex > -1) {
     cart[existingIndex].qty += qty;
   } else {
-    cart.push({
-      ...item,
-      qty: qty,
-      measurements: measurements
-    });
+    cart.push({ ...item, qty: qty, measurements: measurements });
   }
-  
+
   localStorage.setItem('al_halal_cart_state', JSON.stringify(cart));
   updateCartUI();
   closeTailorModal();
@@ -331,7 +357,6 @@ function checkoutWhatsApp() {
     alert("Please add at least one material to your order list first.");
     return;
   }
-
   localStorage.setItem('al_halal_pending_cart', JSON.stringify(cart));
   window.location.href = 'payment.html';
 }
@@ -344,21 +369,13 @@ function initNavigation() {
   const mobileLinks = document.querySelectorAll('.mobile-link');
 
   if (mobileMenuBtn && mobileNavOverlay) {
-    mobileMenuBtn.addEventListener('click', () => {
-      mobileNavOverlay.classList.add('active');
-    });
+    mobileMenuBtn.addEventListener('click', () => { mobileNavOverlay.classList.add('active'); });
   }
-
   if (closeMobileNav && mobileNavOverlay) {
-    closeMobileNav.addEventListener('click', () => {
-      mobileNavOverlay.classList.remove('active');
-    });
+    closeMobileNav.addEventListener('click', () => { mobileNavOverlay.classList.remove('active'); });
   }
-
   mobileLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      if (mobileNavOverlay) mobileNavOverlay.classList.remove('active');
-    });
+    link.addEventListener('click', () => { if (mobileNavOverlay) mobileNavOverlay.classList.remove('active'); });
   });
 }
 
@@ -367,18 +384,10 @@ function initCartDrawer() {
   const closeCartBtn = document.getElementById('closeCartBtn');
   const cartOverlay = document.getElementById('cartOverlay');
 
-  if (cartBtn && cartOverlay) {
-    cartBtn.addEventListener('click', openCartDrawer);
-  }
-
-  if (closeCartBtn && closeCartBtn) {
-    closeCartBtn.addEventListener('click', closeCartDrawer);
-  }
-
+  if (cartBtn && cartOverlay) cartBtn.addEventListener('click', openCartDrawer);
+  if (closeCartBtn) closeCartBtn.addEventListener('click', closeCartDrawer);
   if (cartOverlay) {
-    cartOverlay.addEventListener('click', (e) => {
-      if (e.target === cartOverlay) closeCartDrawer();
-    });
+    cartOverlay.addEventListener('click', (e) => { if (e.target === cartOverlay) closeCartDrawer(); });
   }
 }
 
@@ -391,6 +400,7 @@ function closeCartDrawer() {
   const cartOverlay = document.getElementById('cartOverlay');
   if (cartOverlay) cartOverlay.classList.remove('active');
 }
+
 // Contact Form Handler
 function handleFormSubmit(e) {
   e.preventDefault();
@@ -398,11 +408,8 @@ function handleFormSubmit(e) {
   const phone = document.getElementById('phone').value;
   const material = document.getElementById('material').value;
   const message = document.getElementById('message').value;
-
   const text = `Hello Al Halāl Ventures! 👋\n\nName: *${name}*\nPhone: ${phone}\nInterested Material: *${material}*\n\nMessage/Quantity:\n${message}`;
-
-  const waUrl = `https://wa.me/2349071351283?text=${encodeURIComponent(text)}`;
-  window.open(waUrl, '_blank');
+  window.open(`https://wa.me/2349071351283?text=${encodeURIComponent(text)}`, '_blank');
 }
 
 // Hero Slider Carousel Logic
@@ -424,9 +431,7 @@ function initHeroSlider() {
 
 function startHeroSliderTimer() {
   stopHeroSliderTimer();
-  heroSliderTimer = setInterval(() => {
-    moveHeroSlide(1);
-  }, 4500);
+  heroSliderTimer = setInterval(() => { moveHeroSlide(1); }, 4500);
 }
 
 function stopHeroSliderTimer() {
@@ -440,32 +445,23 @@ function setHeroSlide(index) {
   const badgeSubtitle = document.getElementById('heroBadgeSubtitle');
 
   if (!slides.length) return;
-
   if (index >= slides.length) currentSlideIndex = 0;
   else if (index < 0) currentSlideIndex = slides.length - 1;
   else currentSlideIndex = index;
 
   slides.forEach((slide, idx) => {
-    if (idx === currentSlideIndex) {
-      slide.classList.add('active');
-    } else {
-      slide.classList.remove('active');
-    }
+    if (idx === currentSlideIndex) slide.classList.add('active');
+    else slide.classList.remove('active');
   });
-
   dots.forEach((dot, idx) => {
-    if (idx === currentSlideIndex) {
-      dot.classList.add('active');
-    } else {
-      dot.classList.remove('active');
-    }
+    if (idx === currentSlideIndex) dot.classList.add('active');
+    else dot.classList.remove('active');
   });
 
   if (badgeTitle && badgeSubtitle && heroSlideBadgeData[currentSlideIndex]) {
     badgeTitle.textContent = heroSlideBadgeData[currentSlideIndex].title;
     badgeSubtitle.textContent = heroSlideBadgeData[currentSlideIndex].subtitle;
   }
-
   startHeroSliderTimer();
 }
 

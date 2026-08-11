@@ -1,253 +1,281 @@
-// Al Halāl Ventures - Customer Profile & Auth Javascript
-let usersDB = [];
-let currentUser = null;
-let allOrders = [];
+/* ==========================================================================
+   AL HALAL VENTURES - CUSTOMER ACCOUNT (Supabase Auth)
+   ========================================================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadUsersDatabase();
-  checkUserSession();
-  loadAllOrders();
-  renderProfileDashboard();
+let currentUser = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await checkAuthState();
+
+  // Listen for auth state changes (login/logout from other tabs)
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      currentUser = session.user;
+      await onUserLoggedIn();
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+      localStorage.removeItem('al_halal_current_user');
+      showAuthScreen();
+    }
+  });
 });
 
-// Load registered user list
-function loadUsersDatabase() {
-  const usersStr = localStorage.getItem('al_halal_users_db');
-  if (usersStr) {
-    try {
-      usersDB = JSON.parse(usersStr);
-    } catch(e) {
-      usersDB = [];
-    }
-  }
-}
-
-// Load user sessions
-function checkUserSession() {
-  const userStr = localStorage.getItem('al_halal_current_user');
-  if (userStr) {
-    try {
-      currentUser = JSON.parse(userStr);
-    } catch(e) {
-      currentUser = null;
-    }
-  }
-}
-
-// Load master orders database
-function loadAllOrders() {
-  const ordersStr = localStorage.getItem('al_halal_orders');
-  if (ordersStr) {
-    try {
-      allOrders = JSON.parse(ordersStr);
-    } catch(e) {
-      allOrders = [];
-    }
-  }
-}
-
-// Render Dashboard based on Authentication State
-function renderProfileDashboard() {
-  const authContainer = document.getElementById('authContainer');
-  const profileContainer = document.getElementById('profileContainer');
-  const welcomeTitle = document.getElementById('welcomeUserTitle');
-  
-  if (!authContainer || !profileContainer) return;
-  
-  if (currentUser) {
-    // User is logged in
-    authContainer.style.display = "none";
-    profileContainer.style.display = "block";
-    if (welcomeTitle) welcomeTitle.innerHTML = `<span class="highlight">Welcome, ${currentUser.name}</span>`;
-    
-    // Fill in saved measurements
-    if (currentUser.measurements) {
-      document.getElementById('profileWaist').value = currentUser.measurements.waist || "";
-      document.getElementById('profileLength').value = currentUser.measurements.length || "";
-      document.getElementById('profileThigh').value = currentUser.measurements.thigh || "";
-      document.getElementById('profileAnkle').value = currentUser.measurements.ankle || "";
-    }
-    if (currentUser.address) {
-      document.getElementById('profileAddress').value = currentUser.address;
-    }
-    
-    renderCustomerOrders();
+async function checkAuthState() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    await onUserLoggedIn();
   } else {
-    // User is logged out
-    authContainer.style.display = "block";
-    profileContainer.style.display = "none";
+    showAuthScreen();
   }
 }
 
-// Switch between Login and Register Tabs
+// Called whenever a user is confirmed as logged in
+async function onUserLoggedIn() {
+  showProfileDashboard();
+  await loadMeasurements();
+  await loadOrderHistory();
+}
+
+// ---- AUTH TAB SWITCHING ----
 function switchAuthTab(tab) {
-  const tabLogin = document.getElementById('tabLoginBtn');
-  const tabRegister = document.getElementById('tabRegisterBtn');
   const loginForm = document.getElementById('loginForm');
   const registerForm = document.getElementById('registerForm');
-  
+  const tabLoginBtn = document.getElementById('tabLoginBtn');
+  const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+
   if (tab === 'login') {
-    tabLogin.classList.add('active');
-    tabRegister.classList.remove('active');
     loginForm.style.display = 'block';
     registerForm.style.display = 'none';
+    tabLoginBtn.classList.add('active');
+    tabRegisterBtn.classList.remove('active');
   } else {
-    tabLogin.classList.remove('active');
-    tabRegister.classList.add('active');
     loginForm.style.display = 'none';
     registerForm.style.display = 'block';
+    tabLoginBtn.classList.remove('active');
+    tabRegisterBtn.classList.add('active');
   }
 }
 
-// Handle Account Register
-function handleRegister(e) {
-  e.preventDefault();
+// ---- LOGIN ----
+async function handleLogin(event) {
+  event.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const btn = event.target.querySelector('button[type="submit"]');
+
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in...';
+  btn.disabled = true;
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    showToast('Login failed: ' + error.message, true);
+    btn.innerHTML = 'Sign In';
+    btn.disabled = false;
+    return;
+  }
+
+  currentUser = data.user;
+  await onUserLoggedIn();
+}
+
+// ---- REGISTER ----
+async function handleRegister(event) {
+  event.preventDefault();
   const name = document.getElementById('registerName').value.trim();
-  const email = document.getElementById('registerEmail').value.trim().toLowerCase();
+  const email = document.getElementById('registerEmail').value.trim();
   const phone = document.getElementById('registerPhone').value.trim();
   const password = document.getElementById('registerPassword').value;
-  
-  // Check duplicate email
-  if (usersDB.some(u => u.email === email)) {
-    alert("An account with this email address already exists.");
+  const btn = event.target.querySelector('button[type="submit"]');
+
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
+  btn.disabled = true;
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: name, phone: phone }
+    }
+  });
+
+  if (error) {
+    showToast('Registration failed: ' + error.message, true);
+    btn.innerHTML = 'Create Account';
+    btn.disabled = false;
     return;
   }
-  
-  const newUser = {
-    name: name,
-    email: email,
-    phone: phone,
-    password: password,
-    measurements: null,
-    address: ""
-  };
-  
-  usersDB.push(newUser);
-  localStorage.setItem('al_halal_users_db', JSON.stringify(usersDB));
-  
-  // Log in user immediately
-  currentUser = newUser;
-  localStorage.setItem('al_halal_current_user', JSON.stringify(currentUser));
-  
-  showToast("Account Created Successfully!");
-  renderProfileDashboard();
-}
 
-// Handle Account Login
-function handleLogin(e) {
-  e.preventDefault();
-  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const password = document.getElementById('loginPassword').value;
-  
-  const user = usersDB.find(u => u.email === email && u.password === password);
-  if (!user) {
-    alert("Invalid email or password. Please try again.");
+  // Check if email confirmation is required
+  if (data.user && !data.session) {
+    showToast('Account created! Please check your email to confirm your account before logging in.');
+    btn.innerHTML = 'Create Account';
+    btn.disabled = false;
     return;
   }
-  
-  currentUser = user;
-  localStorage.setItem('al_halal_current_user', JSON.stringify(currentUser));
-  
-  showToast("Welcome Back!");
-  renderProfileDashboard();
+
+  currentUser = data.user;
+  await onUserLoggedIn();
 }
 
-// Handle Logout
-function handleLogout() {
+// ---- LOGOUT ----
+async function handleLogout() {
+  await supabaseClient.auth.signOut();
   currentUser = null;
   localStorage.removeItem('al_halal_current_user');
-  renderProfileDashboard();
+  showAuthScreen();
 }
 
-// Save Tailoring specs to profile
-function saveMeasurements(e) {
-  e.preventDefault();
+// ---- UI VIEWS ----
+function showAuthScreen() {
+  document.getElementById('authContainer').style.display = 'block';
+  document.getElementById('profileContainer').style.display = 'none';
+}
+
+function showProfileDashboard() {
+  document.getElementById('authContainer').style.display = 'none';
+  document.getElementById('profileContainer').style.display = 'block';
+
+  const name = currentUser?.user_metadata?.full_name || currentUser?.email?.split('@')[0] || 'Customer';
+  const el = document.getElementById('welcomeUserTitle');
+  if (el) el.textContent = `Welcome, ${name.split(' ')[0]}!`;
+}
+
+// ---- MEASUREMENTS ----
+async function loadMeasurements() {
   if (!currentUser) return;
-  
-  const waist = parseFloat(document.getElementById('profileWaist').value);
-  const length = parseFloat(document.getElementById('profileLength').value);
-  const thigh = parseFloat(document.getElementById('profileThigh').value);
-  const ankle = parseFloat(document.getElementById('profileAnkle').value);
-  const address = document.getElementById('profileAddress').value.trim();
-  
-  // Update current session user
-  currentUser.measurements = {
-    waist: waist,
-    length: length,
-    thigh: thigh,
-    ankle: ankle
-  };
-  currentUser.address = address;
-  localStorage.setItem('al_halal_current_user', JSON.stringify(currentUser));
-  
-  // Update database record
-  usersDB = usersDB.map(u => {
-    if (u.email === currentUser.email) {
-      return { ...u, measurements: currentUser.measurements, address: currentUser.address };
-    }
-    return u;
-  });
-  localStorage.setItem('al_halal_users_db', JSON.stringify(usersDB));
-  
-  showToast("Measurements Profile Saved!");
+
+  const { data, error } = await supabaseClient
+    .from('measurements')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .maybeSingle();
+
+  if (data) {
+    document.getElementById('profileWaist').value = data.waist || '';
+    document.getElementById('profileLength').value = data.trouser_length || '';
+    document.getElementById('profileThigh').value = data.thigh || '';
+    document.getElementById('profileAnkle').value = data.ankle || '';
+    document.getElementById('profileAddress').value = data.default_address || '';
+
+    // Sync to localStorage so product cart modal can auto-fill
+    syncMeasurementsToLocalStorage(data);
+  }
 }
 
-// Render orders relating to this customer account
-function renderCustomerOrders() {
-  const tableBody = document.getElementById('profileHistoryTableBody');
-  const countBadge = document.getElementById('profileHistoryCount');
-  
-  if (!tableBody) return;
-  
-  // Filter master order list matching user details
-  const myOrders = allOrders.filter(order => 
-    order.contactPhone === currentUser.phone || 
-    order.fullName.toLowerCase() === currentUser.name.toLowerCase()
-  );
-  
-  if (countBadge) countBadge.textContent = `${myOrders.length} Order${myOrders.length !== 1 ? 's' : ''}`;
-  
-  if (myOrders.length === 0) {
-    tableBody.innerHTML = `
+async function saveMeasurements(event) {
+  event.preventDefault();
+  if (!currentUser) return;
+
+  const waist = parseFloat(document.getElementById('profileWaist').value) || null;
+  const trouser_length = parseFloat(document.getElementById('profileLength').value) || null;
+  const thigh = parseFloat(document.getElementById('profileThigh').value) || null;
+  const ankle = parseFloat(document.getElementById('profileAnkle').value) || null;
+  const default_address = document.getElementById('profileAddress').value.trim();
+
+  const record = {
+    user_id: currentUser.id,
+    waist,
+    trouser_length,
+    thigh,
+    ankle,
+    default_address,
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabaseClient
+    .from('measurements')
+    .upsert(record, { onConflict: 'user_id' });
+
+  if (error) {
+    showToast('Error saving: ' + error.message, true);
+    return;
+  }
+
+  syncMeasurementsToLocalStorage(record);
+  showToast('Profile & measurements saved! ✅');
+}
+
+function syncMeasurementsToLocalStorage(data) {
+  // Used by openTailorModal in script.js for auto-fill
+  localStorage.setItem('al_halal_current_user', JSON.stringify({
+    id: currentUser?.id,
+    name: currentUser?.user_metadata?.full_name || '',
+    email: currentUser?.email || '',
+    phone: currentUser?.user_metadata?.phone || '',
+    address: data.default_address || '',
+    measurements: {
+      waist: data.waist,
+      length: data.trouser_length,
+      thigh: data.thigh,
+      ankle: data.ankle
+    }
+  }));
+}
+
+// ---- ORDER HISTORY ----
+async function loadOrderHistory() {
+  if (!currentUser) return;
+
+  const { data: orders, error } = await supabaseClient
+    .from('orders')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  const tbody = document.getElementById('profileHistoryTableBody');
+  const countEl = document.getElementById('profileHistoryCount');
+
+  if (!orders || orders.length === 0) {
+    if (countEl) countEl.textContent = '0 Orders';
+    if (tbody) tbody.innerHTML = `
       <tr>
-        <td colspan="6" style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.4);">
-          <i class="fa-solid fa-receipt" style="font-size: 2rem; margin-bottom: 0.5rem; display: block; color: var(--accent-gold);"></i>
-          You have not placed any orders yet.
+        <td colspan="6" style="text-align: center; padding: 2rem; opacity: 0.6;">
+          <i class="fa-solid fa-folder-open" style="display: block; font-size: 2rem; margin-bottom: 0.5rem; color: var(--accent-lilac);"></i>
+          No orders yet. Your order history will appear here after your first purchase.
         </td>
       </tr>
     `;
     return;
   }
-  
-  const sortedOrders = [...myOrders].reverse();
-  tableBody.innerHTML = sortedOrders.map(order => {
-    const itemsDescription = order.items.map(i => `${i.name} (Qty: ${i.qty})`).join(', ');
-    return `
-      <tr>
-        <td class="text-gold" style="font-weight: 600;">${order.orderId}</td>
-        <td>${order.date}</td>
-        <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${itemsDescription}">
-          ${itemsDescription}
-        </td>
-        <td style="font-weight: 600;">₦${order.total.toLocaleString()}</td>
-        <td>${order.paymentRef || 'N/A'}</td>
-        <td>
-          <span class="status-badge status-pending">
-            <i class="fa-solid fa-clock-spin fa-spin" style="font-size: 0.75rem; margin-right: 0.2rem;"></i> Pending Verification
-          </span>
-        </td>
-      </tr>
-    `;
-  }).join('');
+
+  if (countEl) countEl.textContent = `${orders.length} Order${orders.length !== 1 ? 's' : ''}`;
+
+  if (tbody) {
+    tbody.innerHTML = orders.map(order => {
+      const items = Array.isArray(order.items) ? order.items : [];
+      const itemsList = items.map(i => `${i.name} (${i.qty} ${i.unit})`).join(', ');
+      const date = new Date(order.created_at).toLocaleString('en-NG', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+      const isVerified = order.status === 'Verified';
+      return `
+        <tr>
+          <td class="text-gold" style="font-weight: 600;">#${order.order_code}</td>
+          <td>${date}</td>
+          <td style="max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${itemsList}">${itemsList}</td>
+          <td style="font-weight: 600;">₦${order.grand_total.toLocaleString()}</td>
+          <td>${order.payment_ref}</td>
+          <td>
+            <span class="status-badge ${isVerified ? 'status-verified' : 'status-pending'}">
+              <i class="fa-solid ${isVerified ? 'fa-circle-check' : 'fa-clock'}"></i>
+              ${order.status}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
 }
 
-function showToast(msg) {
+// ---- TOAST ----
+function showToast(message, isError = false) {
   const toast = document.getElementById('toast');
-  if (toast) {
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => {
-      toast.classList.remove('show');
-    }, 2500);
-  }
+  if (!toast) return;
+  toast.textContent = message;
+  toast.style.background = isError ? 'linear-gradient(135deg, #ff5252, #c62828)' : '';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
 }
