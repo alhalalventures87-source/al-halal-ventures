@@ -155,7 +155,7 @@ function renderProducts(items) {
         </div>
         <div class="product-actions">
           <button class="btn btn-primary w-100" onclick="addToCart(${product.id})">
-            <i class="fa-solid fa-plus"></i> Add To Order
+            <i class="fa-solid fa-bag-shopping"></i> Buy Now
           </button>
           <a href="https://wa.me/2349071351283?text=Hello%20Al%20Halal%20Ventures,%20I%20am%20interested%20in%20${encodeURIComponent(product.name)}" target="_blank" class="btn btn-whatsapp" aria-label="Inquire via WhatsApp">
             <i class="fa-brands fa-whatsapp"></i>
