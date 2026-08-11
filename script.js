@@ -211,22 +211,10 @@ function searchProducts() {
   renderProducts(filtered);
 }
 
-// Global login status cache for instant button responses
-let isUserLoggedInCached = false;
-
 // Cart Functions
 function addToCart(productId) {
-  // Synchronously check if user is logged in
-  const hasLocalUser = localStorage.getItem('al_halal_current_user');
-  const hasSupabaseToken = Object.keys(localStorage).some(key => key.includes('sb-') && key.includes('-auth-token'));
-
-  if (!isUserLoggedInCached && !hasLocalUser && !hasSupabaseToken) {
-    localStorage.setItem('al_halal_redirect_product', productId);
-    window.location.href = "profile.html";
-    return;
-  }
-
-  openTailorModal(productId);
+  localStorage.setItem('al_halal_redirect_product', productId);
+  window.location.href = "profile.html";
 }
 
 function removeFromCart(productId) {
