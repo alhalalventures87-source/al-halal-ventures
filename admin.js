@@ -20,7 +20,7 @@ function checkSessionUnlock() {
 function unlockAdminPortal(e) {
   e.preventDefault();
   const password = document.getElementById('adminPass').value;
-  if (password === 'admin123') {
+  if (password === 'Adeola@1') {
     isAdminUnlocked = true;
     sessionStorage.setItem('al_halal_admin_unlocked', 'true');
     document.getElementById('adminLockScreen').style.display = 'none';
@@ -29,6 +29,14 @@ function unlockAdminPortal(e) {
   } else {
     alert("Incorrect password. Access denied.");
   }
+}
+
+function lockAdminPortal() {
+  isAdminUnlocked = false;
+  sessionStorage.removeItem('al_halal_admin_unlocked');
+  document.getElementById('adminDashboard').style.display = 'none';
+  document.getElementById('adminLockScreen').style.display = 'block';
+  document.getElementById('adminPass').value = '';
 }
 
 async function initAdminPanel() {

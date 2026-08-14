@@ -47,8 +47,8 @@
       <div class="glass-panel" style="padding: 2.5rem;">
         <form onsubmit="unlockAdminPortal(event)">
           <div class="form-group">
-            <label for="adminPass">Merchant Password</label>
-            <input type="password" id="adminPass" required placeholder="Default password is: admin123" style="width: 100%; padding: 0.95rem 1.2rem; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-md); color: #fff;">
+            <label for="adminPass">Merchant Access Password</label>
+            <input type="password" id="adminPass" required placeholder="Enter secret password" style="width: 100%; padding: 0.95rem 1.2rem; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: var(--radius-md); color: #fff;">
           </div>
           <button type="submit" class="btn btn-primary w-100" style="background: linear-gradient(135deg, var(--accent-purple), var(--primary-main)); color: #fff; padding: 1rem; border: none; font-weight: 600; border-radius: var(--radius-md); cursor: pointer; margin-top: 1rem;">
             Authenticate Access
@@ -59,7 +59,8 @@
 
     <!-- Authenticated View: Admin Dashboard -->
     <div id="adminDashboard" class="admin-wrapper" style="display: none;">
-      <div class="payment-intro text-center">
+      <div class="payment-intro text-center" style="position: relative;">
+        <button onclick="lockAdminPortal()" style="position: absolute; right: 0; top: 0; background: rgba(255, 82, 82, 0.15); border: 1px solid rgba(255, 82, 82, 0.3); color: #ff5252; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 0.85rem;"><i class="fa-solid fa-lock"></i> Lock Admin Session</button>
         <span class="sub-heading"><i class="fa-solid fa-gears"></i> Command Center</span>
         <h1 class="section-title">Al Halāl Merchant Panel</h1>
         <p class="section-desc">Set materials prices and review incoming customer order specifications.</p>
