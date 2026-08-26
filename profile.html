@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Customer Account | Al Halāl Ventures</title>
+  
+  <!-- Primary Meta Tags -->
+  <meta name="description" content="Customer portal for Al Halāl Ventures. Sign in or create an account to save your tailoring measurements, manage delivery addresses, and track fabric orders.">
+  <meta name="author" content="Al Halāl Ventures">
+  <meta name="robots" content="index, follow">
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +17,7 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="payment.css"> <!-- Reuses premium card and form layouts -->
+  <link rel="stylesheet" href="payment.css">
 </head>
 <body class="payment-portal-body">
 
@@ -28,127 +34,195 @@
         </div>
       </a>
       <nav class="navbar">
-        <a href="index.html#home" class="nav-link"><i class="fa-solid fa-arrow-left-long"></i> Back to Catalog</a>
+        <a href="index.html" class="nav-link"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="index.html#catalog" class="nav-link"><i class="fa-solid fa-layer-group"></i> Shop Materials</a>
+        <a href="index.html#contact" class="nav-link"><i class="fa-solid fa-envelope"></i> Contact Us</a>
       </nav>
+      <div class="header-actions">
+        <a href="index.html#catalog" class="btn btn-outline" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">
+          <i class="fa-solid fa-bag-shopping"></i> Shop Catalog
+        </a>
+      </div>
     </div>
   </header>
 
-  <main class="payment-main container" style="max-width: 800px;">
-    <!-- Logged Out View: Authentication -->
+  <main class="payment-main container" style="max-width: 860px; padding-bottom: 5rem;">
+    <!-- Logged Out View: Authentication (Sign In & Register) -->
     <div id="authContainer" class="auth-wrapper">
       <div class="payment-intro text-center">
         <span class="sub-heading"><i class="fa-solid fa-user-lock"></i> Customer Portal</span>
-        <h1 class="section-title">Sign In / Register Account</h1>
-        <p class="section-desc">Create an account to save your tailoring measurements, manage addresses, and view order logs.</p>
+        <h1 class="section-title" id="authSectionTitle">Customer Account</h1>
+        <p class="section-desc">Create your account or log in to save custom tailoring measurements, enjoy fast 1-click ordering, and track your purchases.</p>
         <div class="title-underline"></div>
       </div>
 
-      <div class="glass-panel" style="padding: 3rem;">
-        <!-- Tabs to switch login/signup -->
-        <div style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
-          <button id="tabLoginBtn" class="filter-btn active" onclick="switchAuthTab('login')" style="flex: 1; padding: 0.8rem;">Login</button>
-          <button id="tabRegisterBtn" class="filter-btn" onclick="switchAuthTab('register')" style="flex: 1; padding: 0.8rem;">Register</button>
+      <div class="glass-panel" style="padding: 2.5rem 3rem;">
+        <!-- Tabs to switch login / signup -->
+        <div style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.12); padding-bottom: 1rem;">
+          <button id="tabLoginBtn" class="filter-btn active" onclick="switchAuthTab('login')" style="flex: 1; padding: 0.9rem; font-size: 1.05rem; font-weight: 600;">
+            <i class="fa-solid fa-right-to-bracket"></i> Sign In
+          </button>
+          <button id="tabRegisterBtn" class="filter-btn" onclick="switchAuthTab('register')" style="flex: 1; padding: 0.9rem; font-size: 1.05rem; font-weight: 600;">
+            <i class="fa-solid fa-user-plus"></i> Create Account
+          </button>
         </div>
 
         <!-- Login Form -->
         <form id="loginForm" onsubmit="handleLogin(event)">
           <div class="form-group">
-            <label for="loginEmail">Email Address</label>
-            <input type="email" id="loginEmail" required placeholder="e.g. customer@example.com">
+            <label for="loginEmail"><i class="fa-solid fa-envelope text-gold"></i> Email Address</label>
+            <input type="email" id="loginEmail" required placeholder="e.g. customer@example.com" autocomplete="email">
           </div>
           <div class="form-group">
-            <label for="loginPassword">Password</label>
-            <input type="password" id="loginPassword" required placeholder="••••••••">
+            <label for="loginPassword"><i class="fa-solid fa-lock text-gold"></i> Password</label>
+            <div class="password-input-wrap">
+              <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password">
+              <i class="fa-solid fa-eye password-toggle-icon" onclick="togglePasswordVisibility('loginPassword', this)"></i>
+            </div>
           </div>
-          <button type="submit" class="btn btn-primary w-100" style="background: linear-gradient(135deg, var(--accent-purple), var(--primary-main)); color: #fff; padding: 1rem; border: none; font-weight: 600; border-radius: var(--radius-md); cursor: pointer; margin-top: 1rem;">
-            Sign In
+          <button type="submit" class="btn btn-primary w-100" style="background: linear-gradient(135deg, var(--accent-purple), var(--primary-main)); color: #fff; padding: 1rem; border: none; font-weight: 600; font-size: 1rem; border-radius: var(--radius-md); cursor: pointer; margin-top: 1.2rem;">
+            <i class="fa-solid fa-right-to-bracket"></i> Sign In to Account
           </button>
+          <div class="auth-switch-prompt">
+            Don't have an account yet? <a onclick="switchAuthTab('register')">Create an account here</a>
+          </div>
         </form>
 
         <!-- Register Form -->
         <form id="registerForm" onsubmit="handleRegister(event)" style="display: none;">
           <div class="form-group">
-            <label for="registerName">Full Name</label>
-            <input type="text" id="registerName" required placeholder="e.g. Hajia Fatima Yusuf">
+            <label for="registerName"><i class="fa-solid fa-user text-gold"></i> Full Name</label>
+            <input type="text" id="registerName" required placeholder="e.g. Hajia Fatima Yusuf" autocomplete="name">
           </div>
           <div class="form-group">
-            <label for="registerEmail">Email Address</label>
-            <input type="email" id="registerEmail" required placeholder="e.g. customer@example.com">
+            <label for="registerEmail"><i class="fa-solid fa-envelope text-gold"></i> Email Address</label>
+            <input type="email" id="registerEmail" required placeholder="e.g. customer@example.com" autocomplete="email">
           </div>
           <div class="form-group">
-            <label for="registerPhone">WhatsApp Phone Number</label>
-            <input type="tel" id="registerPhone" required placeholder="e.g. +234 907 135 1283">
+            <label for="registerPhone"><i class="fa-brands fa-whatsapp text-green"></i> WhatsApp Phone Number</label>
+            <input type="tel" id="registerPhone" required placeholder="e.g. +234 907 135 1283" autocomplete="tel">
           </div>
           <div class="form-group">
-            <label for="registerPassword">Password</label>
-            <input type="password" id="registerPassword" required placeholder="Choose a secure password">
+            <label for="registerPassword"><i class="fa-solid fa-lock text-gold"></i> Choose Password (minimum 6 characters)</label>
+            <div class="password-input-wrap">
+              <input type="password" id="registerPassword" minlength="6" required placeholder="••••••••" autocomplete="new-password">
+              <i class="fa-solid fa-eye password-toggle-icon" onclick="togglePasswordVisibility('registerPassword', this)"></i>
+            </div>
           </div>
-          <button type="submit" class="btn btn-primary w-100" style="background: linear-gradient(135deg, var(--accent-purple), var(--primary-main)); color: #fff; padding: 1rem; border: none; font-weight: 600; border-radius: var(--radius-md); cursor: pointer; margin-top: 1rem;">
-            Create Account
+          <button type="submit" class="btn btn-primary w-100" style="background: linear-gradient(135deg, var(--accent-purple), var(--primary-main)); color: #fff; padding: 1rem; border: none; font-weight: 600; font-size: 1rem; border-radius: var(--radius-md); cursor: pointer; margin-top: 1.2rem;">
+            <i class="fa-solid fa-user-plus"></i> Create Free Account
           </button>
+          <div class="auth-switch-prompt">
+            Already have an account? <a onclick="switchAuthTab('login')">Sign in here</a>
+          </div>
         </form>
+      </div>
+
+      <!-- Account Benefits Footer Callout -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 2.5rem;">
+        <div class="glass-panel" style="padding: 1.5rem; text-align: center; margin-bottom: 0;">
+          <i class="fa-solid fa-scissors" style="font-size: 1.8rem; color: var(--accent-gold); margin-bottom: 0.8rem; display: block;"></i>
+          <h4 style="margin-bottom: 0.4rem; color: #fff; font-size: 1rem;">Saved Measurements</h4>
+          <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Your custom waist & trouser lengths auto-fill for every order.</p>
+        </div>
+        <div class="glass-panel" style="padding: 1.5rem; text-align: center; margin-bottom: 0;">
+          <i class="fa-solid fa-bolt" style="font-size: 1.8rem; color: var(--accent-lilac); margin-bottom: 0.8rem; display: block;"></i>
+          <h4 style="margin-bottom: 0.4rem; color: #fff; font-size: 1rem;">Fast Checkout</h4>
+          <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">1-Click order dispatch directly to your preferred delivery address.</p>
+        </div>
+        <div class="glass-panel" style="padding: 1.5rem; text-align: center; margin-bottom: 0;">
+          <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.8rem; color: var(--whatsapp-green); margin-bottom: 0.8rem; display: block;"></i>
+          <h4 style="margin-bottom: 0.4rem; color: #fff; font-size: 1rem;">Order Records</h4>
+          <p style="font-size: 0.85rem; opacity: 0.8; margin: 0;">Track your orders and download payment reference receipts.</p>
+        </div>
       </div>
     </div>
 
     <!-- Logged In View: Profile Dashboard -->
     <div id="profileContainer" class="profile-wrapper" style="display: none;">
       <div class="payment-intro text-center">
-        <span class="sub-heading"><i class="fa-solid fa-address-card"></i> Welcome Back</span>
+        <span class="sub-heading"><i class="fa-solid fa-address-card"></i> Account Dashboard</span>
         <h1 class="section-title" id="welcomeUserTitle">Customer Dashboard</h1>
-        <p class="section-desc">Manage your saved custom sewing measurements and view personal fabric orders.</p>
+        <p class="section-desc">Manage your saved tailoring measurements, update delivery details, and review past fabric orders.</p>
         <div class="title-underline"></div>
       </div>
 
+      <!-- User Info Header Card -->
+      <div class="glass-panel" style="padding: 1.8rem 2.2rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.2rem;">
+        <div style="display: flex; align-items: center; gap: 1.2rem;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gold), var(--accent-purple)); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--primary-dark); font-weight: 700;">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div>
+            <h3 id="profileUserFullName" style="font-family: var(--font-heading); font-size: 1.3rem; margin: 0; color: #fff;">Customer Name</h3>
+            <span id="profileUserEmail" style="font-size: 0.88rem; color: var(--accent-lavender); opacity: 0.9;">customer@example.com</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.8rem; align-items: center;">
+          <a href="index.html#catalog" class="btn btn-outline" style="padding: 0.6rem 1.2rem; font-size: 0.88rem;">
+            <i class="fa-solid fa-bag-shopping"></i> Browse Materials
+          </a>
+          <button class="btn" onclick="handleLogout()" style="background: rgba(255, 82, 82, 0.15); border: 1px solid rgba(255, 82, 82, 0.3); color: #ff5252; padding: 0.6rem 1.2rem; border-radius: 50px; font-weight: 600; cursor: pointer; font-size: 0.88rem; transition: var(--transition);">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Tailoring & Measurements Form -->
       <div class="glass-panel" style="padding: 2.5rem; margin-bottom: 2.5rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.2rem; margin-bottom: 1.5rem;">
           <h2 style="font-family: var(--font-heading); font-size: 1.5rem; margin: 0;"><i class="fa-solid fa-scissors text-gold"></i> Saved Tailoring Profile</h2>
-          <button class="btn" onclick="handleLogout()" style="background: rgba(255, 82, 82, 0.1); border: 1px solid rgba(255, 82, 82, 0.2); color: #ff5252; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; cursor: pointer; font-size: 0.85rem;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+          <span style="font-size: 0.82rem; color: var(--accent-gold); background: rgba(224, 169, 109, 0.15); padding: 0.3rem 0.8rem; border-radius: 20px; border: 1px solid rgba(224, 169, 109, 0.3);">
+            <i class="fa-solid fa-check"></i> Auto-fills on checkout
+          </span>
         </div>
 
         <form id="measurementsForm" onsubmit="saveMeasurements(event)">
-          <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 1.5rem;"><i class="fa-solid fa-circle-info"></i> Save your measurements here, and they will automatically apply and auto-fill when ordering fabrics from the shop.</p>
+          <p style="font-size: 0.9rem; opacity: 0.85; margin-bottom: 1.5rem; line-height: 1.5;">
+            <i class="fa-solid fa-circle-info text-gold"></i> Save your custom sewing measurements below. When you select fabrics from the catalog, your measurements will automatically attach to your order list.
+          </p>
           
           <div class="form-group-row">
             <div class="form-group">
-              <label for="profileWaist">Waist Size (inches)</label>
-              <input type="number" id="profileWaist" step="0.1" placeholder="e.g. 34" required>
+              <label for="profileWaist"><i class="fa-solid fa-ruler-horizontal text-gold"></i> Waist Size (inches)</label>
+              <input type="number" id="profileWaist" step="0.1" placeholder="e.g. 34">
             </div>
             <div class="form-group">
-              <label for="profileLength">Trouser Length (inches)</label>
-              <input type="number" id="profileLength" step="0.1" placeholder="e.g. 40" required>
+              <label for="profileLength"><i class="fa-solid fa-ruler-vertical text-gold"></i> Trouser Length (inches)</label>
+              <input type="number" id="profileLength" step="0.1" placeholder="e.g. 40">
             </div>
           </div>
 
           <div class="form-group-row">
             <div class="form-group">
-              <label for="profileThigh">Thigh Width (inches)</label>
-              <input type="number" id="profileThigh" step="0.1" placeholder="e.g. 24" required>
+              <label for="profileThigh"><i class="fa-solid fa-arrows-left-right text-gold"></i> Thigh Width (inches)</label>
+              <input type="number" id="profileThigh" step="0.1" placeholder="e.g. 24">
             </div>
             <div class="form-group">
-              <label for="profileAnkle">Ankle Opening / Width (inches)</label>
-              <input type="number" id="profileAnkle" step="0.1" placeholder="e.g. 15" required>
+              <label for="profileAnkle"><i class="fa-solid fa-socks text-gold"></i> Ankle Opening (inches)</label>
+              <input type="number" id="profileAnkle" step="0.1" placeholder="e.g. 15">
             </div>
           </div>
 
           <div class="form-group">
-            <label for="profileAddress">Default Shipping Address</label>
-            <textarea id="profileAddress" rows="3" placeholder="Enter default delivery address..."></textarea>
+            <label for="profileAddress"><i class="fa-solid fa-location-dot text-gold"></i> Default Delivery Address</label>
+            <textarea id="profileAddress" rows="3" placeholder="Enter full delivery address for nationwide dispatch..."></textarea>
           </div>
 
-          <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, var(--accent-purple), var(--primary-main)); color: #fff; padding: 1rem 2rem; border: none; font-weight: 600; border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+          <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, var(--accent-purple), var(--primary-main)); color: #fff; padding: 1rem 2.5rem; border: none; font-weight: 600; border-radius: var(--radius-md); cursor: pointer; display: inline-flex; align-items: center; gap: 0.6rem; margin-top: 0.8rem; font-size: 1rem;">
             <i class="fa-solid fa-save"></i> Save Tailoring Profile
           </button>
         </form>
       </div>
 
-      <!-- History ledger nested inside account dashboard for cleaner view -->
-      <div class="glass-panel history-section" style="padding: 2.5rem; margin-bottom: 5rem;">
-        <div class="history-header">
-          <h2 style="margin: 0; font-size: 1.5rem;"><i class="fa-solid fa-clock-rotate-left text-gold"></i> Your Order Ledger</h2>
+      <!-- Order History Ledger -->
+      <div class="glass-panel history-section" style="padding: 2.5rem; margin-bottom: 3rem;">
+        <div class="history-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.2rem; margin-bottom: 1.5rem;">
+          <h2 style="margin: 0; font-size: 1.5rem; font-family: var(--font-heading);"><i class="fa-solid fa-clock-rotate-left text-gold"></i> Your Order Ledger</h2>
           <span class="history-badge" id="profileHistoryCount">0 Orders</span>
         </div>
         
-        <div class="history-table-wrapper">
+        <div class="history-table-wrapper" style="overflow-x: auto;">
           <table class="history-table">
             <thead>
               <tr>
@@ -170,8 +244,31 @@
   </main>
 
   <footer class="main-footer">
-    <div class="container">
-      <p>&copy; 2026 Al Halāl Ventures. All Rights Reserved. Elegance Rooted In Modesty.</p>
+    <div class="container footer-content" style="padding: 2.5rem 0;">
+      <div class="footer-brand">
+        <h3>Al Halāl Ventures</h3>
+        <p>Elegance Rooted In Modesty.</p>
+        <p class="small text-muted">Specialists in Executive Materials, Jonkoso, Duchess, Socks, Niqob, Sleeves & accessories.</p>
+      </div>
+      <div class="footer-nav">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Home Store</a></li>
+          <li><a href="index.html#catalog">Shop Materials</a></li>
+          <li><a href="index.html#contact">Contact Us</a></li>
+          <li><a href="profile.html">Customer Account</a></li>
+        </ul>
+      </div>
+      <div class="footer-contact">
+        <h4>Direct WhatsApp</h4>
+        <p><i class="fa-brands fa-whatsapp text-green"></i> 0907 135 1283</p>
+        <p><i class="fa-solid fa-phone text-gold"></i> 0907 135 1283</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>&copy; 2026 Al Halāl Ventures. All Rights Reserved. Elegance Rooted In Modesty.</p>
+      </div>
     </div>
   </footer>
 
@@ -179,7 +276,8 @@
 
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
-  <script src="profile.js"></script>
+  <script src="supabase-config.js?v=4"></script>
+  <script src="profile.js?v=4"></script>
 </body>
 </html>
+

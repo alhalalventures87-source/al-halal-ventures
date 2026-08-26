@@ -194,7 +194,7 @@
         <a href="#catalog" class="nav-link">Shop Materials</a>
         <a href="#about" class="nav-link">About Us</a>
         <a href="#contact" class="nav-link">Contact Us</a>
-        <a href="profile.html" class="nav-link" style="color: var(--accent-gold);"><i class="fa-solid fa-user"></i> Profile</a>
+        <a href="profile.html" class="nav-account-pill" id="navAccountBtn"><i class="fa-solid fa-user-circle"></i> <span>Customer Account</span></a>
       </nav>
 
       <div class="header-actions">
@@ -223,7 +223,7 @@
         <li><a href="#catalog" class="mobile-link">Shop Materials</a></li>
         <li><a href="#about" class="mobile-link">About Us</a></li>
         <li><a href="#contact" class="mobile-link">Contact Us</a></li>
-        <li><a href="profile.html" class="mobile-link" style="color: var(--accent-gold);"><i class="fa-solid fa-user"></i> My Account</a></li>
+        <li><a href="profile.html" class="mobile-link" id="mobileAccountBtn" style="color: var(--accent-gold); font-weight: 600;"><i class="fa-solid fa-user-circle"></i> Customer Account (Login / Register)</a></li>
       </ul>
       <div class="mobile-contact-info">
         <p><strong>Direct WhatsApp:</strong></p>
@@ -244,7 +244,8 @@
         
         <div class="hero-cta-group">
           <a href="#catalog" class="btn btn-primary"><i class="fa-solid fa-layer-group"></i> Explore Catalog</a>
-          <a href="https://wa.me/2349071351283?text=Hello%20Al%20Halal%20Ventures,%20I%20would%20like%20to%20inquire%20about%20your%20fabrics." target="_blank" class="btn btn-whatsapp-glow"><i class="fa-brands fa-whatsapp"></i> Order On WhatsApp</a>
+          <a href="profile.html?tab=register" class="btn btn-outline-gold"><i class="fa-solid fa-user-plus"></i> Create Account</a>
+          <a href="https://wa.me/2349071351283?text=Hello%20Al%20Halal%20Ventures,%20I%20would%20like%20to%20inquire%20about%20your%20fabrics." target="_blank" class="btn btn-whatsapp-glow"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
         </div>
 
         <div class="hero-features">
@@ -391,6 +392,80 @@
       <!-- Product Grid -->
       <div class="product-grid" id="productGrid">
         <!-- Javascript renders product cards here -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Customer Account Portal Section -->
+  <section id="account-portal" class="section-padding account-cta-section">
+    <div class="container">
+      <div class="account-cta-card">
+        <div class="account-cta-grid">
+          <div class="account-cta-text">
+            <span class="sub-heading"><i class="fa-solid fa-sparkles text-gold"></i> Personalized Tailoring Portal</span>
+            <h2 class="section-title">Customer Account &amp; Fitting Profile</h2>
+            <p class="section-desc">Create your free account today to store custom tailoring measurements, enjoy fast 1-click ordering, and track your delivery status in real-time.</p>
+            
+            <div class="account-benefits-list">
+              <div class="benefit-item">
+                <i class="fa-solid fa-scissors"></i>
+                <div>
+                  <strong>Save Custom Tailoring Sizes</strong>
+                  <span>Save your waist, trouser length, thigh, and ankle measurements once—they auto-attach to your fabric orders.</span>
+                </div>
+              </div>
+              <div class="benefit-item">
+                <i class="fa-solid fa-bolt"></i>
+                <div>
+                  <strong>Fast &amp; Easy 1-Click Ordering</strong>
+                  <span>Instant checkout with your saved delivery address and WhatsApp receipts.</span>
+                </div>
+              </div>
+              <div class="benefit-item">
+                <i class="fa-solid fa-receipt"></i>
+                <div>
+                  <strong>Personal Order History Ledger</strong>
+                  <span>Access your complete order history, payment reference codes, and status updates anytime.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="account-cta-buttons">
+              <a href="profile.html?tab=register" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Create Free Account</a>
+              <a href="profile.html?tab=login" class="btn btn-outline-gold"><i class="fa-solid fa-right-to-bracket"></i> Sign In to Account</a>
+            </div>
+          </div>
+
+          <div class="account-cta-preview">
+            <div class="account-preview-card">
+              <span class="preview-badge"><i class="fa-solid fa-shield-check"></i> Customer Account Perks</span>
+              <h3 style="font-family: var(--font-heading); color: #fff; font-size: 1.25rem; margin-bottom: 1.2rem;">Account Advantages</h3>
+              
+              <div class="preview-row">
+                <span>Account Setup</span>
+                <strong>Free &amp; Instant</strong>
+              </div>
+              <div class="preview-row">
+                <span>Measurements Storage</span>
+                <strong>Auto-fills on order</strong>
+              </div>
+              <div class="preview-row">
+                <span>WhatsApp Order Sync</span>
+                <strong>Automatic Receipt</strong>
+              </div>
+              <div class="preview-row">
+                <span>Nationwide Delivery</span>
+                <strong>Direct Dispatch</strong>
+              </div>
+              
+              <div style="margin-top: 1.5rem; text-align: center;">
+                <a href="profile.html" class="btn btn-primary w-100" style="padding: 0.85rem; font-size: 0.95rem;">
+                  <i class="fa-solid fa-user-gear"></i> Open Customer Portal
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>

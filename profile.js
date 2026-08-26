@@ -5,6 +5,13 @@
 let currentUser = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Check URL params for specific tab (?tab=register or ?tab=login)
+  const urlParams = new URLSearchParams(window.location.search);
+  const requestedTab = urlParams.get('tab');
+  if (requestedTab === 'register') {
+    switchAuthTab('register');
+  }
+
   await checkAuthState();
 
   // Listen for auth state changes (login/logout from other tabs)
@@ -43,17 +50,35 @@ function switchAuthTab(tab) {
   const registerForm = document.getElementById('registerForm');
   const tabLoginBtn = document.getElementById('tabLoginBtn');
   const tabRegisterBtn = document.getElementById('tabRegisterBtn');
+  const authTitle = document.getElementById('authSectionTitle');
 
   if (tab === 'login') {
     loginForm.style.display = 'block';
     registerForm.style.display = 'none';
     tabLoginBtn.classList.add('active');
     tabRegisterBtn.classList.remove('active');
+    if (authTitle) authTitle.textContent = 'Customer Sign In';
   } else {
     loginForm.style.display = 'none';
     registerForm.style.display = 'block';
     tabLoginBtn.classList.remove('active');
     tabRegisterBtn.classList.add('active');
+    if (authTitle) authTitle.textContent = 'Create Customer Account';
+  }
+}
+
+// Password Visibility Toggle
+function togglePasswordVisibility(inputId, iconEl) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    iconEl.classList.remove('fa-eye');
+    iconEl.classList.add('fa-eye-slash');
+  } else {
+    input.type = 'password';
+    iconEl.classList.remove('fa-eye-slash');
+    iconEl.classList.add('fa-eye');
   }
 }
 
@@ -71,12 +96,13 @@ async function handleLogin(event) {
 
   if (error) {
     showToast('Login failed: ' + error.message, true);
-    btn.innerHTML = 'Sign In';
+    btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In to Account';
     btn.disabled = false;
     return;
   }
 
   currentUser = data.user;
+  showToast('Welcome back! Successfully logged in. 🎉');
   await onUserLoggedIn();
 }
 
@@ -102,7 +128,7 @@ async function handleRegister(event) {
 
   if (error) {
     showToast('Registration failed: ' + error.message, true);
-    btn.innerHTML = 'Create Account';
+    btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Free Account';
     btn.disabled = false;
     return;
   }
@@ -110,12 +136,13 @@ async function handleRegister(event) {
   // Check if email confirmation is required
   if (data.user && !data.session) {
     showToast('Account created! Please check your email to confirm your account before logging in.');
-    btn.innerHTML = 'Create Account';
+    btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Free Account';
     btn.disabled = false;
     return;
   }
 
   currentUser = data.user;
+  showToast('Account created successfully! Welcome to Al Halāl Ventures. 🎉');
   await onUserLoggedIn();
 }
 
@@ -125,6 +152,7 @@ async function handleLogout() {
   currentUser = null;
   localStorage.removeItem('al_halal_current_user');
   showAuthScreen();
+  showToast('You have been logged out.');
 }
 
 // ---- UI VIEWS ----
@@ -138,8 +166,17 @@ function showProfileDashboard() {
   document.getElementById('profileContainer').style.display = 'block';
 
   const name = currentUser?.user_metadata?.full_name || currentUser?.email?.split('@')[0] || 'Customer';
+  const email = currentUser?.email || '';
+  const phone = currentUser?.user_metadata?.phone || '';
+
   const el = document.getElementById('welcomeUserTitle');
   if (el) el.textContent = `Welcome, ${name.split(' ')[0]}!`;
+
+  const nameEl = document.getElementById('profileUserFullName');
+  if (nameEl) nameEl.textContent = name;
+
+  const emailEl = document.getElementById('profileUserEmail');
+  if (emailEl) emailEl.textContent = phone ? `${email} • WhatsApp: ${phone}` : email;
 }
 
 // ---- MEASUREMENTS ----

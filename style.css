@@ -1314,3 +1314,225 @@ img {
     height: 36px;
   }
 }
+
+/* ==========================================================================
+   CUSTOMER ACCOUNT & TWO-PAGE FLOW STYLES
+   ========================================================================== */
+
+.btn-outline-gold {
+  border: 2px solid var(--accent-gold);
+  color: var(--accent-gold);
+  background: transparent;
+}
+
+.btn-outline-gold:hover {
+  background: var(--accent-gold);
+  color: var(--primary-dark);
+  box-shadow: 0 4px 15px rgba(224, 169, 109, 0.4);
+  transform: translateY(-2px);
+}
+
+.nav-account-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1.1rem;
+  background: rgba(224, 169, 109, 0.15);
+  border: 1px solid rgba(224, 169, 109, 0.45);
+  border-radius: 50px;
+  color: var(--accent-gold) !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.nav-account-pill:hover {
+  background: var(--accent-gold);
+  color: var(--primary-dark) !important;
+  box-shadow: 0 0 15px rgba(224, 169, 109, 0.4);
+  transform: translateY(-2px);
+}
+
+.nav-account-pill::after {
+  display: none !important;
+}
+
+/* Customer Account CTA Section on Index */
+.account-cta-section {
+  background: radial-gradient(circle at 50% 50%, rgba(90, 24, 154, 0.25), transparent 70%), var(--bg-surface);
+  position: relative;
+  overflow: hidden;
+}
+
+.account-cta-card {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+
+.account-cta-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(224, 169, 109, 0.15), transparent 70%);
+  pointer-events: none;
+}
+
+.account-cta-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (max-width: 992px) {
+  .account-cta-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.account-benefits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin: 2rem 0;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.benefit-item i {
+  width: 38px;
+  height: 38px;
+  background: rgba(224, 169, 109, 0.15);
+  border: 1px solid rgba(224, 169, 109, 0.35);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-gold);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.benefit-item strong {
+  display: block;
+  font-size: 1.05rem;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
+
+.benefit-item span {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+.account-cta-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.account-preview-card {
+  background: rgba(18, 2, 36, 0.7);
+  border: 1px solid rgba(224, 170, 255, 0.2);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.preview-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(37, 211, 102, 0.15);
+  border: 1px solid rgba(37, 211, 102, 0.3);
+  color: var(--whatsapp-green);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  margin-bottom: 1.2rem;
+}
+
+.preview-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.9rem;
+}
+
+.preview-row:last-child {
+  border-bottom: none;
+}
+
+.preview-row span {
+  color: var(--accent-lavender);
+}
+
+.preview-row strong {
+  color: var(--accent-gold);
+}
+
+/* Password Input Toggle */
+.password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrap input {
+  width: 100%;
+  padding-right: 2.8rem !important;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 1rem;
+  color: var(--accent-lavender);
+  opacity: 0.7;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.password-toggle-icon:hover {
+  opacity: 1;
+  color: var(--accent-gold);
+}
+
+.auth-switch-prompt {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  color: var(--text-light);
+  opacity: 0.85;
+}
+
+.auth-switch-prompt a {
+  color: var(--accent-gold);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: 0.3rem;
+}
+
+.auth-switch-prompt a:hover {
+  color: var(--accent-lavender);
+}
+

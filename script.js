@@ -79,11 +79,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   initHeroSlider();
   updateCartUI();
 
-  // Cache session state in background
+  // Check auth session and update navbar status
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session) isUserLoggedInCached = true;
-  } catch (e) {}
+    updateNavAuthUI(session);
+
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      updateNavAuthUI(session);
+    });
+  } catch (e) {
+    console.error("Auth session check error in script.js", e);
+  }
 
   // If user clicked Buy Now before logging in and just logged in, auto-open tailoring modal
   const redirectProductId = localStorage.getItem('al_halal_redirect_product');
@@ -95,6 +101,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 });
+
+// Update navbar with user login state
+function updateNavAuthUI(session) {
+  const navAccountBtn = document.getElementById('navAccountBtn');
+  const mobileAccountBtn = document.getElementById('mobileAccountBtn');
+
+  if (session && session.user) {
+    const name = session.user.user_metadata?.full_name?.split(' ')[0] || session.user.email?.split('@')[0] || 'Account';
+    if (navAccountBtn) {
+      navAccountBtn.innerHTML = `<i class="fa-solid fa-user-check text-gold"></i> <span>Hi, ${name}</span>`;
+      navAccountBtn.title = "View Customer Dashboard";
+    }
+    if (mobileAccountBtn) {
+      mobileAccountBtn.innerHTML = `<i class="fa-solid fa-user-check text-gold"></i> My Account (Hi, ${name})`;
+    }
+  } else {
+    if (navAccountBtn) {
+      navAccountBtn.innerHTML = `<i class="fa-solid fa-user-circle"></i> <span>Customer Account</span>`;
+      navAccountBtn.title = "Login or Create Account";
+    }
+    if (mobileAccountBtn) {
+      mobileAccountBtn.innerHTML = `<i class="fa-solid fa-user-circle"></i> Customer Account (Login / Register)`;
+    }
+  }
+}
 
 // Show a loading spinner in the product grid
 function showProductLoadingState() {
@@ -212,9 +243,20 @@ function searchProducts() {
 }
 
 // Cart Functions
-function addToCart(productId) {
+async function addToCart(productId) {
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session && session.user) {
+      openTailorModal(productId);
+      return;
+    }
+  } catch (e) {
+    console.error("Session check error", e);
+  }
+
+  // If unauthenticated, redirect to account creation/login page
   localStorage.setItem('al_halal_redirect_product', productId);
-  window.location.href = "profile.html";
+  window.location.href = "profile.html?tab=register";
 }
 
 function removeFromCart(productId) {
